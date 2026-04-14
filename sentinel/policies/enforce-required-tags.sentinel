@@ -1,0 +1,25 @@
+# Sentinel Policy: Enforce Required Tags
+# This policy ensures all AWS resources have required tags applied.
+
+import "tfplan/v2" as tfplan
+
+required_tags = ["environment", "owner", "cost_center"]
+
+aws_resources = filter tfplan.resource_changes as _, rc {
+  rc.type matches "^aws_" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+tags_present = rule {
+  all aws_resources as _, resource {
+    all required_tags as tag {
+      tag in keys(resource.change.after.tags) and
+      resource.change.after.tags[tag] is not null and
+      resource.change.after.tags[tag] is not ""
+    }
+  }
+}
+
+main = rule {
+  tags_present
+}
