@@ -14,7 +14,7 @@ resource "aws_waf_web_acl" "validation_test" {
 }
 
 # Test resource for aws_kinesis_firehose_delivery_stream validation
-resource "aws_kinesis_firehose_delivery_stream" "validation_test" {
+resource "aws_kinesis_firehose_delivery_stream" "waf_logging_validation_test" {
   name        = "aws-waf-logs-validation-test"
   destination = "extended_s3"
 
