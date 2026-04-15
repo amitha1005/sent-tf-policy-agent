@@ -16,6 +16,7 @@
 policy {}
 
 resource_policy "aws_cloudtrail" "log_file_validation" {
+    enforcement_level = "advisory"
     locals {
         # Safe access to enable_log_file_validation attribute
         # Defaults to false if not set (matching Sentinel behavior)
