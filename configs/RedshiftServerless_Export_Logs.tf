@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_redshiftserverless_namespace" "validation_test" {
   namespace_name = "test-namespace"
   

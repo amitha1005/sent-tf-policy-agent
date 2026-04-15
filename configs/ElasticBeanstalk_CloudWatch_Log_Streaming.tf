@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test resource to validate aws_elastic_beanstalk_environment
 # and the setting block with cloudwatch log streaming configuration
 resource "aws_elastic_beanstalk_application" "test_app" {

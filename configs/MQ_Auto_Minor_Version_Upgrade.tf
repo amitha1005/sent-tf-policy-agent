@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_mq_broker" "validation_test" {
   broker_name             = "test-broker"
   engine_type             = "ActiveMQ"

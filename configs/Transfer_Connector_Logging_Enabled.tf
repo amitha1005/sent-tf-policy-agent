@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Validation test for aws_transfer_connector
 resource "aws_transfer_connector" "validation_test" {
   access_role = "arn:aws:iam::123456789012:role/transfer-access-role"

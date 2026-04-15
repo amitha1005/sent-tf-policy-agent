@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_neptune_cluster" "validation_test" {
   cluster_identifier                  = "test-neptune-cluster"
   engine                             = "neptune"

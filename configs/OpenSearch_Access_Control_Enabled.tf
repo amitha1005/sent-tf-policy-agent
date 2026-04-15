@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_opensearch_domain" "validation_test" {
   domain_name    = "validation-test-domain"
   engine_version = "OpenSearch_2.11"

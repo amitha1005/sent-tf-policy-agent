@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_efs_file_system" "test" {
   creation_token = "test-efs"
 }

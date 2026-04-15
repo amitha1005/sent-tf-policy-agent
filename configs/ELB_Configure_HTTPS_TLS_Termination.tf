@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test configuration to validate aws_elb resource and listener attributes
 resource "aws_elb" "validation_test" {
   name               = "test-elb"

@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_datasync_task" "validation_test" {
   source_location_arn      = "arn:aws:datasync:us-east-1:123456789012:location/loc-12345678901234567"
   destination_location_arn = "arn:aws:datasync:us-east-1:123456789012:location/loc-12345678901234568"

@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test aws_elasticache_cluster resource
 resource "aws_elasticache_cluster" "validation_test" {
   cluster_id           = "test-cluster"

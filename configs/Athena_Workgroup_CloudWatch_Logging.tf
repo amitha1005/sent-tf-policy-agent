@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_athena_workgroup" "validation_test" {
   name = "validation-test-workgroup"
 

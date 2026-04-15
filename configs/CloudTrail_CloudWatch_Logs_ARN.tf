@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_cloudtrail" "validation_test" {
   name                          = "test-trail"
   s3_bucket_name                = "test-bucket"

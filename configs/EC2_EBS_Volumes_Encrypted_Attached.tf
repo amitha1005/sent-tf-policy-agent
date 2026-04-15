@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test aws_ebs_volume with encryption
 resource "aws_ebs_volume" "validation_test" {
   availability_zone = "us-east-1a"

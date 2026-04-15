@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_sqs_queue" "public_access_validation" {
   name = "test-queue-block-public-access"
 }

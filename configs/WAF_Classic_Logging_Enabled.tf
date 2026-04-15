@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test resource for aws_waf_web_acl validation
 resource "aws_waf_web_acl" "validation_test" {
   name        = "validation-test-acl"

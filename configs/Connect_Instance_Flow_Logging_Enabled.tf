@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_connect_instance" "validation_test" {
   identity_management_type   = "CONNECT_MANAGED"
   inbound_calls_enabled      = true

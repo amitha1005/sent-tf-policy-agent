@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_mskconnect_connector" "validation_test" {
   name = "validation-test-connector"
   kafkaconnect_version = "2.7.1"

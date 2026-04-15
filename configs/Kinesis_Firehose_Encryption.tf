@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_kinesis_firehose_delivery_stream" "validation_test" {
   name        = "terraform-kinesis-firehose-test-stream"
   destination = "extended_s3"

@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_acmpca_certificate_authority" "validation_test" {
   type    = "ROOT"
   enabled = true

@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test aws_iam_policy_document data source
 data "aws_iam_policy_document" "test_policy_document" {
   statement {

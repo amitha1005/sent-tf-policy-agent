@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Route53 hosted zone
 resource "aws_route53_zone" "validation_test" {
   name = "example.com"

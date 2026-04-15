@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_rds_cluster" "validation_test" {
   cluster_identifier      = "aurora-cluster-validation"
   engine                  = "aurora-postgresql"

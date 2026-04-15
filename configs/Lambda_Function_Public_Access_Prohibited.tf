@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Lambda function for validation testing
 resource "aws_lambda_function" "test" {
   function_name = "validation_test_function"

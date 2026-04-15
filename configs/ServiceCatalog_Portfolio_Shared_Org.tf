@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Validate aws_servicecatalog_portfolio
 resource "aws_servicecatalog_portfolio" "validation_test" {
   name          = "Test Portfolio"

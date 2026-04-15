@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test configuration for aws_networkfirewall_firewall
 resource "aws_networkfirewall_firewall" "test" {
   name                = "test-firewall"

@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test resource: aws_cloudwatch_event_bus
 resource "aws_cloudwatch_event_bus" "test_bus" {
   name        = "test-custom-event-bus"

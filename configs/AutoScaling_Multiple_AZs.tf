@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test configuration for aws_autoscaling_group validation
 resource "aws_autoscaling_group" "validation_test" {
   name                = "validation-test-asg"

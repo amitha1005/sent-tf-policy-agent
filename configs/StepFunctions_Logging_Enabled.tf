@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_sfn_state_machine" "validation_test" {
   name     = "validation-test-state-machine"
   role_arn = "arn:aws:iam::123456789012:role/step-functions-role"

@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_codebuild_project" "validation_test" {
   name          = "validation-test-project"
   service_role  = "arn:aws:iam::123456789012:role/codebuild-role"

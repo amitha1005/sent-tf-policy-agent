@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_appsync_api_cache" "validation_test" {
   api_id               = "test-api-id"
   api_caching_behavior = "FULL_REQUEST_CACHING"

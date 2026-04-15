@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test configuration for aws_guardduty_detector
 resource "aws_guardduty_detector" "test" {
   enable = true

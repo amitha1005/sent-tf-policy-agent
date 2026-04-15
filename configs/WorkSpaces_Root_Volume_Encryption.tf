@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_workspaces_workspace" "validation_test" {
   directory_id = "d-926720a732"
   bundle_id    = "wsb-clj85qzj1"

@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_apigatewayv2_api" "validation_api" {
   name          = "validation-api"
   protocol_type = "HTTP"

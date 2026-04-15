@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 resource "aws_docdb_cluster" "validation_test" {
   cluster_identifier              = "validation-docdb-cluster"
   engine                         = "docdb"

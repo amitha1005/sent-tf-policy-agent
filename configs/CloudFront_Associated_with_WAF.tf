@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Minimal valid CloudFront distribution for validation
 resource "aws_cloudfront_distribution" "validation_test" {
   enabled = true

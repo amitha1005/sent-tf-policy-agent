@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test configuration for aws_eks_cluster resource validation
 resource "aws_eks_cluster" "validation_test" {
   name     = "test-cluster"

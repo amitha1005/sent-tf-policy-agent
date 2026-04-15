@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test configuration for FSx Lustre File System
 # Validating: copy_tags_to_backups attribute
 resource "aws_fsx_lustre_file_system" "validation_test" {

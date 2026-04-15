@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test aws_redshift_cluster resource with legacy logging block
 resource "aws_redshift_cluster" "test_with_logging" {
   cluster_identifier = "test-cluster-with-logging"
