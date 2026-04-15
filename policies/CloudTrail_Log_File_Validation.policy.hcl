@@ -24,6 +24,6 @@ resource_policy "aws_cloudtrail" "log_file_validation" {
 
     enforce {
         condition = local.validation_enabled == true
-        error_message = "Attribute 'enable_log_file_validation' must be true for 'aws_cloudtrail' resource '${meta.address}'. Enable log file validation to ensure CloudTrail log integrity."
+        error_message = "Attribute 'enable_log_file_validation' must be true for 'aws_cloudtrail'. Enable log file validation to ensure CloudTrail log integrity."
     }
 }
