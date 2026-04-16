@@ -40,7 +40,7 @@ resource_policy "aws_iam_policy_document" "no_admin_privileges" {
 
     enforce {
         condition = !local.has_admin_privileges
-        error_message = "IAM policy document '${meta.address}' grants full administrative privileges (Effect: Allow, Action: *, Resource: *). This violates the principle of least privilege. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1 for more details."
+  error_message = "IAM policy document grants full administrative privileges (Effect: Allow, Action: *, *). This violates the principle of least privilege. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1 for more details."
     }
 }
 
@@ -73,6 +73,6 @@ resource_policy "aws_iam_policy" "no_admin_privileges" {
 
     enforce {
         condition = !local.has_admin_privileges
-        error_message = "IAM policy '${meta.address}' grants full administrative privileges (Effect: Allow, Action: *, Resource: *). This violates the principle of least privilege. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1 for more details."
+  error_message = "IAM policy grants full administrative privileges (Effect: Allow, Action: *, *). This violates the principle of least privilege. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1 for more details."
     }
 }

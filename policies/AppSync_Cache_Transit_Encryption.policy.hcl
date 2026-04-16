@@ -22,6 +22,6 @@ resource_policy "aws_appsync_api_cache" "transit_encryption_enabled" {
 
     enforce {
         condition = local.transit_encryption_enabled == true
-        error_message = "Attribute 'transit_encryption_enabled' must be set to 'true' for 'aws_appsync_api_cache' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/appsync-controls.html#appsync-6 for more details."
+  error_message = "Attribute 'transit_encryption_enabled' must be set to 'true' for 'aws_appsync_api_cache' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/appsync-controls.html#appsync-6 for more details."
     }
 }

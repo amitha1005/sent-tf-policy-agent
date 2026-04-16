@@ -23,6 +23,6 @@ resource_policy "aws_fsx_lustre_file_system" "copy_tags_to_backups" {
 
     enforce {
         condition = local.copy_tags_enabled == true
-        error_message = "Attributes 'copy_tags_to_backups' must be true for 'aws_fsx_lustre_file_system' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/fsx-controls.html#fsx-2 for more details."
+  error_message = "Attributes 'copy_tags_to_backups' must be true for 'aws_fsx_lustre_file_system' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/fsx-controls.html#fsx-2 for more details."
     }
 }

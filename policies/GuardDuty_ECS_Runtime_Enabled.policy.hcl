@@ -21,7 +21,7 @@ resource_policy "aws_guardduty_detector" "detector_enabled" {
 
     enforce {
         condition = local.detector_enabled == true
-        error_message = "GuardDuty ECS Runtime Monitoring should be enabled. GuardDuty detector '${meta.address}' must have 'enable = true'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-12 for more details."
+  error_message = "GuardDuty ECS Runtime Monitoring should be enabled. GuardDuty detector must have 'enable = true'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-12 for more details."
     }
 }
 
@@ -47,6 +47,6 @@ resource_policy "aws_guardduty_detector_feature" "runtime_monitoring_enabled" {
 
     enforce {
         condition = local.is_enabled
-        error_message = "GuardDuty ECS Runtime Monitoring should be enabled. Feature '${meta.address}' has name 'EKS_RUNTIME_MONITORING' but status is '${local.feature_status}'. Set 'status = \"ENABLED\"'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-12 for more details."
+  error_message = "GuardDuty ECS Runtime Monitoring should be enabled. Feature has name 'EKS_RUNTIME_MONITORING' but status is '${local.feature_status}'. Set 'status = \"ENABLED\"'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/guardduty-controls.html#guardduty-12 for more details."
     }
 }

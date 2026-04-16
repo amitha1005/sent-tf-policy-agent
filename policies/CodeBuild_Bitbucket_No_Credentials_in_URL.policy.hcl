@@ -63,6 +63,6 @@ resource_policy "aws_codebuild_project" "bitbucket_url_credentials_check" {
     
     enforce {
         condition = local.is_compliant
-        error_message = "In 'aws_codebuild_project' resource '${meta.address}', Bitbucket source repository URL should not contain personal access tokens or a user name and password. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/codebuild-controls.html#codebuild-1 for more details."
+  error_message = "In 'aws_codebuild_project' resource, Bitbucket source repository URL should not contain personal access tokens or a user name and password. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/codebuild-controls.html#codebuild-1 for more details."
     }
 }

@@ -42,6 +42,6 @@ resource_policy "aws_iam_policy_document" "restrict_decrypt_all_kms_keys" {
 
     enforce {
         condition = !local.has_blocked_actions
-        error_message = "Actions 'kms:ReEncryptFrom' and 'kms:Decrypt' must not be allowed on all 'KMS keys' in IAM policy document '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/kms-controls.html#kms-2 for more details."
+  error_message = "Actions 'kms:ReEncryptFrom' and 'kms:Decrypt' must not be allowed on all 'KMS keys' in IAM policy document. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/kms-controls.html#kms-2 for more details."
     }
 }

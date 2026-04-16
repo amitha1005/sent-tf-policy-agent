@@ -25,6 +25,6 @@ resource_policy "aws_redshiftserverless_namespace" "log_exports_required" {
     
     enforce {
         condition = local.has_connectionlog && local.has_userlog
-        error_message = "Redshift Serverless namespace '${meta.address}' should export logs to CloudWatch Logs. Both 'connectionlog' and 'userlog' should be configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/redshiftserverless-controls.html#redshiftserverless-6 for more details."
+  error_message = "Redshift Serverless namespace should export logs to CloudWatch Logs. Both 'connectionlog' and 'userlog' should be configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/redshiftserverless-controls.html#redshiftserverless-6 for more details."
     }
 }

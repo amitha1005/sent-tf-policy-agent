@@ -28,6 +28,6 @@ resource_policy "aws_route53_query_log" "dns_query_logging_enabled" {
     
     enforce {
         condition = local.has_valid_log_group_arn
-        error_message = "Route 53 public hosted zones should log DNS queries. Resource '${meta.address}' does not have a valid 'cloudwatch_log_group_arn' configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/route53-controls.html#route53-2 for more details."
+  error_message = "Route 53 public hosted zones should log DNS queries. Resource does not have a valid 'cloudwatch_log_group_arn' configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/route53-controls.html#route53-2 for more details."
     }
 }

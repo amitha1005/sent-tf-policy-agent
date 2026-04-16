@@ -36,6 +36,6 @@ resource_policy "aws_autoscaling_group" "multiple_azs" {
     
     enforce {
         condition = local.has_multiple_azs
-        error_message = "Attribute 'availability_zones' or 'vpc_zone_identifier' should have atleast two values for AWS Autoscaling Group '${meta.address}'. Current availability_zones: ${local.az_count}, vpc_zone_identifier: ${local.vpc_zone_count}. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-2 for more details."
+  error_message = "Attribute 'availability_zones' or 'vpc_zone_identifier' should have atleast two values for AWS Autoscaling Group. Current availability_zones: ${local.az_count}, vpc_zone_identifier: ${local.vpc_zone_count}. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/autoscaling-controls.html#autoscaling-2 for more details."
     }
 }

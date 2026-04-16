@@ -49,6 +49,6 @@ resource_policy "aws_redshift_cluster" "audit_logging_enabled" {
   
   enforce {
     condition = local.is_compliant
-    error_message = "Parameter 'logging' should be enabled or referenced to resource AWS Redshift Logging for AWS Redshift Cluster '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-4 for more details."
+ error_message = "Parameter 'logging' should be enabled or referenced to resource AWS Redshift Logging for AWS Redshift Cluster. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/redshift-controls.html#redshift-4 for more details."
   }
 }

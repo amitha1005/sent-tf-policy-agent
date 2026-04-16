@@ -28,6 +28,6 @@ resource_policy "aws_docdb_cluster" "audit_logging_enabled" {
     
     enforce {
         condition = local.has_audit_logging
-        error_message = "Attribute 'enabled_cloudwatch_logs_exports' should be 'audit' for AWS DocumentDb Cluster at '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-4 for more details."
+  error_message = "Attribute 'enabled_cloudwatch_logs_exports' should be 'audit' for AWS DocumentDb Cluster. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/documentdb-controls.html#documentdb-4 for more details."
     }
 }

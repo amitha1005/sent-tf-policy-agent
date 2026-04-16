@@ -25,6 +25,6 @@ resource_policy "aws_apigatewayv2_stage" "access_logging_configured" {
     
     enforce {
         condition = local.has_access_logging
-        error_message = "'aws_apigatewayv2_stage' resource '${meta.address}' must have access logging configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/apigateway-controls.html#apigateway-9 for more details."
+  error_message = "'aws_apigatewayv2_stage' resource must have access logging configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/apigateway-controls.html#apigateway-9 for more details."
     }
 }

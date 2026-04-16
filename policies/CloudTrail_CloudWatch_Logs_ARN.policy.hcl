@@ -33,6 +33,6 @@ resource_policy "aws_cloudtrail" "cloudwatch_logs_group_arn" {
 
     enforce {
         condition = local.is_configured
-        error_message = "Attribute 'cloud_watch_logs_group_arn' must be present for 'aws_cloudtrail' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-5 for more details."
+  error_message = "Attribute 'cloud_watch_logs_group_arn' must be present for 'aws_cloudtrail' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/cloudtrail-controls.html#cloudtrail-5 for more details."
     }
 }

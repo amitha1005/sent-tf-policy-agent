@@ -32,6 +32,6 @@ resource_policy "aws_opensearch_domain" "access_control_enabled" {
     
     enforce {
         condition = local.access_control_properly_configured
-        error_message = "Attribute 'anonymous_auth_enabled' in 'advanced_security_options' should be true and 'advanced_security_options' should be enabled for Fine Grained Access Control for AWS OpenSearch Domain '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/opensearch-controls.html#opensearch-7 for more details."
+  error_message = "Attribute 'anonymous_auth_enabled' in 'advanced_security_options' should be true and 'advanced_security_options' should be enabled for Fine Grained Access Control for AWS OpenSearch Domain. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/opensearch-controls.html#opensearch-7 for more details."
     }
 }

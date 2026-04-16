@@ -29,6 +29,6 @@ resource_policy "aws_servicecatalog_portfolio_share" "shared_within_organization
     
     enforce {
         condition = local.is_compliant
-        error_message = "Attribute 'type' must not be 'ACCOUNT' for 'aws_servicecatalog_portfolio_share' resource '${meta.address}'. Use 'ORGANIZATION', 'ORGANIZATIONAL_UNIT', or 'ORGANIZATION_MEMBER_ACCOUNT' instead. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/servicecatalog-controls.html#servicecatalog-1 for more details."
+  error_message = "Attribute 'type' must not be 'ACCOUNT' for 'aws_servicecatalog_portfolio_share' resource. Use 'ORGANIZATION', 'ORGANIZATIONAL_UNIT', or 'ORGANIZATION_MEMBER_ACCOUNT' instead. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/servicecatalog-controls.html#servicecatalog-1 for more details."
     }
 }

@@ -26,6 +26,6 @@ resource_policy "aws_cloudfront_distribution" "associated_with_waf" {
 
   enforce {
     condition     = local.has_web_acl_id
-    error_message = "'aws_cloudfront_distribution' resource '${meta.address}' must be associated with either AWS WAF Classic or AWS WAF web ACLs. Configure the 'web_acl_id' attribute with a valid WAF web ACL ID or ARN. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-6 for more details."
+ error_message = "'aws_cloudfront_distribution' resource must be associated with either AWS WAF Classic or AWS WAF web ACLs. Configure the 'web_acl_id' attribute with a valid WAF web ACL ID or ARN. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-6 for more details."
   }
 }

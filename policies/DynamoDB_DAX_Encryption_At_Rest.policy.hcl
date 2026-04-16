@@ -30,11 +30,11 @@ resource_policy "aws_dax_cluster" "encryption_at_rest_enabled" {
     # Enforce that server_side_encryption must exist and enabled must be true
     enforce {
         condition = local.has_sse_config
-        error_message = "Attribute 'server_side_encryption' must be configured for aws_dax_cluster resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/dynamodb-controls.html#dynamodb-3 for more details."
+  error_message = "Attribute 'server_side_encryption' must be configured for aws_dax_cluster resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/dynamodb-controls.html#dynamodb-3 for more details."
     }
     
     enforce {
         condition = local.sse_enabled == true
-        error_message = "Attribute 'server_side_encryption' must have 'enabled' set to true for aws_dax_cluster resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/dynamodb-controls.html#dynamodb-3 for more details."
+  error_message = "Attribute 'server_side_encryption' must have 'enabled' set to true for aws_dax_cluster resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/dynamodb-controls.html#dynamodb-3 for more details."
     }
 }

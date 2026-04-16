@@ -42,7 +42,7 @@ resource_policy "aws_glue_job" "supported_version" {
         )
         
         # Safe address for error messages
-        resource_address = core::try(meta.address, "unknown")
+        resource_address = "resource"
         glue_version_display = local.glue_version != null ? local.glue_version : "not set"
     }
     

@@ -44,6 +44,6 @@ resource_policy "aws_cloudwatch_event_bus" "has_attached_policy" {
   
   enforce {
     condition = local.has_policy
-    error_message = "Policy should be attached for 'aws_cloudwatch_event_bus' resource at ${meta.address}. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/eventbridge-controls.html#eventbridge-3 for more details."
+ error_message = "Policy should be attached for 'aws_cloudwatch_event_bus' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/eventbridge-controls.html#eventbridge-3 for more details."
   }
 }

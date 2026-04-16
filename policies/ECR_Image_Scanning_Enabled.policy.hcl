@@ -36,12 +36,12 @@ resource_policy "aws_ecr_repository" "image_scanning_enabled" {
     # Enforce that image_scanning_configuration block exists
     enforce {
         condition = local.has_scanning_config
-        error_message = "ECR repository '${meta.address}' is missing the 'image_scanning_configuration' block. ECR private repositories should have image scanning configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/ecr-controls.html#ecr-1 for more details."
+  error_message = "ECR repository is missing the 'image_scanning_configuration' block. ECR private repositories should have image scanning configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/ecr-controls.html#ecr-1 for more details."
     }
     
     # Enforce that scan_on_push is set to true
     enforce {
         condition = local.scan_on_push == true
-        error_message = "ECR repository '${meta.address}' has 'scan_on_push' set to '${local.scan_on_push}'. The 'scan_on_push' attribute must be set to 'true' to enable image scanning. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/ecr-controls.html#ecr-1 for more details."
+  error_message = "ECR repository has 'scan_on_push' set to '${local.scan_on_push}'. The 'scan_on_push' attribute must be set to 'true' to enable image scanning. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/ecr-controls.html#ecr-1 for more details."
     }
 }

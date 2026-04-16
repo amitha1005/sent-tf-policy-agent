@@ -20,6 +20,6 @@ resource_policy "aws_mq_broker" "auto_minor_version_upgrade_enabled" {
 
     enforce {
         condition = local.auto_upgrade_enabled == true
-        error_message = "Attribute 'auto_minor_version_upgrade' should be true for AWS MQ Broker '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-3 for more details."
+  error_message = "Attribute 'auto_minor_version_upgrade' should be true for AWS MQ Broker. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/mq-controls.html#mq-3 for more details."
     }
 }

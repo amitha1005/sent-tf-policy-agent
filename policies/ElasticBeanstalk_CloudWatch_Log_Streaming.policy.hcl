@@ -36,6 +36,6 @@ resource_policy "aws_elastic_beanstalk_environment" "cloudwatch_log_streaming_en
     
     enforce {
         condition = local.has_log_streaming
-        error_message = "Elastic Beanstalk environment '${meta.address}' does not have CloudWatch log streaming enabled. Add a setting block with namespace='aws:elasticbeanstalk:cloudwatch:logs', name='StreamLogs', and value='true'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/elasticbeanstalk-controls.html#elasticbeanstalk-3 for more details."
+  error_message = "Elastic Beanstalk environment does not have CloudWatch log streaming enabled. Add a setting block with namespace='aws:elasticbeanstalk:cloudwatch:logs', name='StreamLogs', and value='true'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/elasticbeanstalk-controls.html#elasticbeanstalk-3 for more details."
     }
 }

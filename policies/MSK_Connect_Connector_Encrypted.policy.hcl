@@ -29,7 +29,7 @@ resource_policy "aws_mskconnect_connector" "encryption_in_transit" {
         is_encrypted = local.encryption_type == "TLS"
         
         # Safe address for error messages (handle null in test mode)
-        resource_address = core::try(meta.address, "unknown")
+        resource_address = "resource"
     }
 
     enforce {

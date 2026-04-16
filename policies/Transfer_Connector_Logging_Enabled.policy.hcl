@@ -28,6 +28,6 @@ resource_policy "aws_transfer_connector" "logging_enabled" {
     
     enforce {
         condition = local.has_logging_role
-        error_message = "Transfer Family connector '${meta.address}' should have logging enabled by setting the 'logging_role' attribute. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/transfer-controls.html#transfer-3 for more details."
+  error_message = "Transfer Family connector should have logging enabled by setting the 'logging_role' attribute. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/transfer-controls.html#transfer-3 for more details."
     }
 }

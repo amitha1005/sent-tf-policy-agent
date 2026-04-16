@@ -30,6 +30,6 @@ resource_policy "aws_ecs_cluster" "container_insights_enabled" {
     
     enforce {
         condition = local.has_container_insights
-        error_message = "ECS cluster '${meta.address}' must have container insights enabled. Set 'setting { name = \"containerInsights\", value = \"enabled\" }' in the cluster configuration. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-12 for more details."
+  error_message = "ECS cluster must have container insights enabled. Set 'setting { name = \"containerInsights\", value = \"enabled\" }' in the cluster configuration. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/ecs-controls.html#ecs-12 for more details."
     }
 }

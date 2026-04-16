@@ -24,6 +24,6 @@ resource_policy "aws_backup_framework" "recovery_point_encrypted" {
     
     enforce {
         condition = local.has_encryption_control
-        error_message = "AWS Backup Framework '${meta.address}' must include a control named 'BACKUP_RECOVERY_POINT_ENCRYPTED'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/backup-controls.html#backup-1 for more details."
+  error_message = "AWS Backup Framework must include a control named 'BACKUP_RECOVERY_POINT_ENCRYPTED'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/backup-controls.html#backup-1 for more details."
     }
 }

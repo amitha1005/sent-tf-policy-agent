@@ -7,12 +7,12 @@
 # TF Policy Constraints (from terraform-policy-agent-skill):
 # ❌ Constraint #1: Cannot access config-level metadata (constant_value, references, expressions)
 # ❌ Constraint #3: Cannot reliably validate cross-resource relationships
-# ❌ Testing limitation: meta.address is UNDEFINED in mock tests for resource_policy
+# ❌ Testing limitation: resource address metadata is unavailable in mock tests for resource_policy
 #
 # This implementation:
 # ✅ IMPLEMENTED: Validates that EBS volumes have encrypted = true
 # ❌ NOT IMPLEMENTED: Cannot verify volume attachment due to:
-#    - meta.address is UNDEFINED in mock tests (cannot identify resources)
+#    - resource address metadata is unavailable in mock tests (cannot identify resources)
 #    - Cannot access reference metadata to trace volume_id to source volume
 #    - Cross-resource matching unreliable for new resources with unresolved references
 #

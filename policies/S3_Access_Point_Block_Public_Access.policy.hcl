@@ -32,11 +32,11 @@ resource_policy "aws_s3_access_point" "block_public_access_enabled" {
 
     enforce {
         condition = local.has_config
-        error_message = "S3 Access Point '${meta.address}' does not have 'public_access_block_configuration' defined. All attributes in 'public_access_block_configuration' must be set to true. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-19 for more details."
+  error_message = "S3 Access Point does not have 'public_access_block_configuration' defined. All attributes in 'public_access_block_configuration' must be set to true. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-19 for more details."
     }
 
     enforce {
         condition = local.all_enabled
-        error_message = "S3 Access Point '${meta.address}' does not have all attributes in 'public_access_block_configuration' set to true. All of block_public_acls, ignore_public_acls, block_public_policy, and restrict_public_buckets must be true. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-19 for more details."
+  error_message = "S3 Access Point does not have all attributes in 'public_access_block_configuration' set to true. All of block_public_acls, ignore_public_acls, block_public_policy, and restrict_public_buckets must be true. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-19 for more details."
     }
 }

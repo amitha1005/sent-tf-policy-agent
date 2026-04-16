@@ -36,6 +36,6 @@ resource_policy "aws_datasync_task" "logging_enabled" {
     
     enforce {
         condition = local.logging_properly_configured
-        error_message = "Attribute 'cloudwatch_log_group_arn' must not be empty and 'log_level' must not be 'OFF' for 'aws_datasync_task' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/datasync-controls.html#datasync-1 for more details."
+  error_message = "Attribute 'cloudwatch_log_group_arn' must not be empty and 'log_level' must not be 'OFF' for 'aws_datasync_task' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/datasync-controls.html#datasync-1 for more details."
     }
 }

@@ -27,6 +27,6 @@ resource_policy "aws_neptune_cluster" "audit_logs_enabled" {
     
     enforce {
         condition = local.audit_enabled
-        error_message = "Attribute 'enable_cloudwatch_logs_exports' must contain 'audit' for 'aws_neptune_cluster' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-2 for more details."
+  error_message = "Attribute 'enable_cloudwatch_logs_exports' must contain 'audit' for 'aws_neptune_cluster' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/neptune-controls.html#neptune-2 for more details."
     }
 }

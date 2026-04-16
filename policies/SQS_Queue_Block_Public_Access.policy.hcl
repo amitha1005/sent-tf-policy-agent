@@ -43,7 +43,7 @@ resource_policy "aws_sqs_queue" "block_public_access" {
     
     enforce {
         condition = local.has_policy || local.queue_url == null
-        error_message = "SQS queue '${meta.address}' does not have an associated aws_sqs_queue_policy resource. SQS queue access policies should not allow public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/sqs-controls.html#sqs-3 for more details."
+  error_message = "SQS queue does not have an associated aws_sqs_queue_policy resource. SQS queue access policies should not allow public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/sqs-controls.html#sqs-3 for more details."
     }
 }
 
@@ -88,6 +88,6 @@ resource_policy "aws_sqs_queue_policy" "no_public_access" {
     
     enforce {
         condition = local.policy_json == "" || !local.has_public_allow
-        error_message = "SQS queue policy '${meta.address}' allows public access. The policy contains an Allow statement with a wildcard (*) principal. SQS queue access policies should not allow public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/sqs-controls.html#sqs-3 for more details."
+  error_message = "SQS queue policy allows public access. The policy contains an Allow statement with a wildcard (*) principal. SQS queue access policies should not allow public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/sqs-controls.html#sqs-3 for more details."
     }
 }

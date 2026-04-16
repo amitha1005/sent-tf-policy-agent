@@ -24,6 +24,6 @@ resource_policy "aws_inspector2_enabler" "ec2_scanning_enabled" {
     
     enforce {
         condition = local.ec2_enabled
-        error_message = "Amazon Inspector EC2 scanning should be enabled. Resource '${meta.address}' must include 'EC2' in resource_types. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/inspector-controls.html#inspector-1 for more details."
+  error_message = "Amazon Inspector EC2 scanning should be enabled. Resource must include 'EC2' in resource_types. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/inspector-controls.html#inspector-1 for more details."
     }
 }

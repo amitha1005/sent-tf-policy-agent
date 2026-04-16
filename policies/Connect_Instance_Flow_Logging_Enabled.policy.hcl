@@ -22,6 +22,6 @@ resource_policy "aws_connect_instance" "contact_flow_logs_enabled" {
 
     enforce {
         condition = local.contact_flow_logs_enabled == true
-        error_message = "Attribute 'contact_flow_logs_enabled' must be true for 'aws_connect_instance' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/connect-controls.html#connect-2 for more details."
+  error_message = "Attribute 'contact_flow_logs_enabled' must be true for 'aws_connect_instance' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/connect-controls.html#connect-2 for more details."
     }
 }

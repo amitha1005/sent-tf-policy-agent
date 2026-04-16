@@ -34,7 +34,7 @@ resource_policy "aws_elasticache_cluster" "snapshot_retention" {
 
     enforce {
         condition = local.backups_enabled
-        error_message = "Attribute 'snapshot_retention_limit' must be greater than 0 for aws_elasticache_cluster resource '${meta.address}'. Current value: ${local.snapshot_retention_limit}. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/elasticache-controls.html#elasticache-1 for more details."
+  error_message = "Attribute 'snapshot_retention_limit' must be greater than 0 for aws_elasticache_cluster resource. Current value: ${local.snapshot_retention_limit}. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/elasticache-controls.html#elasticache-1 for more details."
     }
 }
 
@@ -51,6 +51,6 @@ resource_policy "aws_elasticache_replication_group" "snapshot_retention" {
 
     enforce {
         condition = local.backups_enabled
-        error_message = "Attribute 'snapshot_retention_limit' must be greater than 0 for aws_elasticache_replication_group resource '${meta.address}'. Current value: ${local.snapshot_retention_limit}. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/elasticache-controls.html#elasticache-1 for more details."
+  error_message = "Attribute 'snapshot_retention_limit' must be greater than 0 for aws_elasticache_replication_group resource. Current value: ${local.snapshot_retention_limit}. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/elasticache-controls.html#elasticache-1 for more details."
     }
 }

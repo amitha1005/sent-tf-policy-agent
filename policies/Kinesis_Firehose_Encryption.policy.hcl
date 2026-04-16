@@ -34,12 +34,12 @@ resource_policy "aws_kinesis_firehose_delivery_stream" "server_side_encryption_e
     // Enforce that the server_side_encryption block exists
     enforce {
         condition = local.has_encryption_block
-        error_message = "Attribute 'server_side_encryption' must be configured for 'aws_kinesis_firehose_delivery_stream' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/datafirehose-controls.html#datafirehose-1 for more details."
+  error_message = "Attribute 'server_side_encryption' must be configured for 'aws_kinesis_firehose_delivery_stream' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/datafirehose-controls.html#datafirehose-1 for more details."
     }
     
     // Enforce that enabled is set to true within the server_side_encryption block
     enforce {
         condition = local.encryption_enabled == true
-        error_message = "Attribute 'server_side_encryption.enabled' must be set to true for 'aws_kinesis_firehose_delivery_stream' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/datafirehose-controls.html#datafirehose-1 for more details."
+  error_message = "Attribute 'server_side_encryption.enabled' must be set to true for 'aws_kinesis_firehose_delivery_stream' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/datafirehose-controls.html#datafirehose-1 for more details."
     }
 }

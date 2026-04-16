@@ -25,6 +25,6 @@ resource_policy "aws_macie2_account" "status_enabled" {
     
     enforce {
         condition = local.is_enabled
-        error_message = "Attribute 'status' should be 'ENABLED' for AWS Macie Account at '${meta.address}'. Current status: '${local.status_value}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/macie-controls.html#macie-1 for more details."
+  error_message = "Attribute 'status' should be 'ENABLED' for AWS Macie Account. Current status: '${local.status_value}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/macie-controls.html#macie-1 for more details."
     }
 }

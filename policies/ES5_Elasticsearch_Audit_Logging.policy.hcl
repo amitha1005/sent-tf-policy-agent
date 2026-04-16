@@ -30,6 +30,6 @@ resource_policy "aws_elasticsearch_domain" "audit_logging_enabled" {
     # Enforce that audit logging must be configured and enabled
     enforce {
         condition = local.has_audit_logs && local.audit_logs_enabled
-        error_message = "Attribute 'enabled' must be set to true and attribute 'log_type' set to 'AUDIT_LOGS' in the 'log_publishing_options' block for 'aws_elasticsearch_domain' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/es-controls.html#es-5 for more details."
+  error_message = "Attribute 'enabled' must be set to true and attribute 'log_type' set to 'AUDIT_LOGS' in the 'log_publishing_options' block for 'aws_elasticsearch_domain' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/es-controls.html#es-5 for more details."
     }
 }

@@ -28,6 +28,6 @@ resource_policy "aws_lambda_permission" "public_access_prohibited" {
     
     enforce {
         condition = !local.is_public_access
-        error_message = "'aws_lambda_function' resource-based policy should prohibit public access outside of your account. The principal field is set to '*' which allows public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html#lambda-1 for more details. Resource: ${meta.address}"
+  error_message = "'aws_lambda_function' resource-based policy should prohibit public access outside of your account. The principal field is set to '*' which allows public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html#lambda-1 for more details. "
     }
 }

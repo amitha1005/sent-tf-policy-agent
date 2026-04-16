@@ -29,6 +29,6 @@ resource_policy "aws_rds_cluster" "aurora_postgresql_logs_to_cloudwatch" {
 
     enforce {
         condition = local.postgresql_logging_enabled
-        error_message = "Aurora PostgreSQL DB cluster '${meta.address}' does not publish logs to CloudWatch Logs. The 'enabled_cloudwatch_logs_exports' must include 'postgresql'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-37 for more details."
+  error_message = "Aurora PostgreSQL DB cluster does not publish logs to CloudWatch Logs. The 'enabled_cloudwatch_logs_exports' must include 'postgresql'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/rds-controls.html#rds-37 for more details."
     }
 }

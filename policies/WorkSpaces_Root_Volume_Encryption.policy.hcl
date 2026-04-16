@@ -24,6 +24,6 @@ resource_policy "aws_workspaces_workspace" "root_volume_encryption_enabled" {
     
     enforce {
         condition = local.encryption_enabled == true
-        error_message = "Attribute 'root_volume_encryption_enabled' must be set to true for 'aws_workspaces_workspace' resource '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/workspaces-controls.html#workspaces-2 for more details."
+  error_message = "Attribute 'root_volume_encryption_enabled' must be set to true for 'aws_workspaces_workspace' resource. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/workspaces-controls.html#workspaces-2 for more details."
     }
 }

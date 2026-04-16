@@ -42,6 +42,6 @@ resource_policy "aws_elb" "https_tls_termination" {
 
     enforce {
         condition = local.all_listeners_compliant
-        error_message = "Classic Load Balancer '${meta.address}' listeners should be configured with HTTPS or TLS termination. Each listener must have 'lb_protocol' set to 'https' or 'ssl' and a non-empty 'ssl_certificate_id'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-3 for more details."
+  error_message = "Classic Load Balancer listeners should be configured with HTTPS or TLS termination. Each listener must have 'lb_protocol' set to 'https' or 'ssl' and a non-empty 'ssl_certificate_id'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-3 for more details."
     }
 }

@@ -25,6 +25,6 @@ resource_policy "aws_dms_replication_instance" "auto_minor_version_upgrade_check
     
     enforce {
         condition = local.auto_minor_version_upgrade == true
-        error_message = "Attribute 'auto_minor_version_upgrade' should be true for AWS DMS Replication Instance '${meta.address}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-6 for more details."
+  error_message = "Attribute 'auto_minor_version_upgrade' should be true for AWS DMS Replication Instance. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/dms-controls.html#dms-6 for more details."
     }
 }

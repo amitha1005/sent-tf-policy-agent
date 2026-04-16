@@ -27,6 +27,6 @@ resource_policy "aws_acmpca_certificate_authority" "root_ca_disabled" {
     
     enforce {
         condition = !local.is_root_and_enabled
-        error_message = "Root CA must be disabled for 'aws_acmpca_certificate_authority' resource '${meta.address}'. Enablement of root CA should be avoided in production. Current configuration: type='${local.ca_type}', enabled='${local.enabled_status}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/pca-controls.html#pca-1 for more details."
+  error_message = "Root CA must be disabled for 'aws_acmpca_certificate_authority' resource. Enablement of root CA should be avoided in production. Current configuration: type='${local.ca_type}', enabled='${local.enabled_status}'. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/pca-controls.html#pca-1 for more details."
     }
 }
