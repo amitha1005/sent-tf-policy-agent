@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Validate aws_sqs_queue resource
 resource "aws_sqs_queue" "validation_test" {
   name = "test-queue"
@@ -10,11 +6,11 @@ resource "aws_sqs_queue" "validation_test" {
 # Validate aws_sqs_queue_policy resource
 resource "aws_sqs_queue_policy" "validation_test" {
   queue_url = aws_sqs_queue.validation_test.url
-  policy    = data.aws_iam_policy_document.validation_test.json
+  policy    = data.aws_iam_policy_document.sqs_validation_test.json
 }
 
 # Validate aws_iam_policy_document data source
-data "aws_iam_policy_document" "validation_test" {
+data "aws_iam_policy_document" "sqs_validation_test" {
   statement {
     sid    = "TestStatement"
     effect = "Allow"

@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-1"
-}
-
 # Test configuration for aws_redshift_cluster
 resource "aws_redshift_cluster" "validation_test" {
   cluster_identifier = "test-cluster"
