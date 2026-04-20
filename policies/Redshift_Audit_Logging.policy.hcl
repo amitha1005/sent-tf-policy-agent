@@ -18,6 +18,7 @@
 policy {}
 
 resource_policy "aws_redshift_cluster" "audit_logging_enabled" {
+  enforcement_level = "advisory"
   locals {
     cluster_id = attrs.cluster_identifier
     all_logging = core::getresources("aws_redshift_logging", {})

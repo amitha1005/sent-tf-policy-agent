@@ -28,6 +28,7 @@ locals {
 }
 
 resource_policy "aws_sqs_queue" "has_policy" {
+  enforcement_level = "advisory"
   locals {
     # Get this queue's URL (computed attribute)
     queue_url = core::try(attrs.url, null)

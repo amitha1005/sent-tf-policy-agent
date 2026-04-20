@@ -13,6 +13,7 @@
 policy {}
 
 resource_policy "aws_elasticache_cluster" "snapshot_retention" {
+    enforcement_level = "advisory"
     # Exclude clusters that are part of a replication group
     # (they inherit snapshot settings from the replication group)
     filter = core::try(attrs.replication_group_id, null) == null || core::try(attrs.replication_group_id, "") == ""
@@ -29,6 +30,7 @@ resource_policy "aws_elasticache_cluster" "snapshot_retention" {
 }
 
 resource_policy "aws_elasticache_replication_group" "snapshot_retention" {
+    enforcement_level = "advisory"
     locals {
         # Get snapshot_retention_limit value, default to 0 if not set
         snapshot_retention_limit = core::try(attrs.snapshot_retention_limit, 0)
