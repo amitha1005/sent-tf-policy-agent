@@ -1,3 +1,7 @@
+provider "aws" {
+  region = "us-east-1"
+}
+
 # Test aws_elasticache_cluster resource
 resource "aws_elasticache_cluster" "validation_test" {
   cluster_id           = "test-cluster"
@@ -6,27 +10,28 @@ resource "aws_elasticache_cluster" "validation_test" {
   num_cache_nodes      = 1
   parameter_group_name = "default.redis7"
   
-  # Attributes to validate for policy
+  # Attribute to validate: snapshot_retention_limit
   snapshot_retention_limit = 5
-  snapshot_window          = "05:00-09:00"
-}
-
-# Test aws_elasticache_cluster with replication_group_id (read replica case)
-resource "aws_elasticache_cluster" "validation_test_replica" {
-  cluster_id           = "test-replica-cluster"
-  replication_group_id = "test-replication-group"
+  
+  # Additional optional attributes mentioned in requirements
+  snapshot_window = "05:00-09:00"
+  port            = 6379
 }
 
 # Test aws_elasticache_replication_group resource
 resource "aws_elasticache_replication_group" "validation_test" {
-  replication_group_id = "test-replication-group"
-  description          = "Test replication group"
-  node_type            = "cache.t2.micro"
+  replication_group_id       = "test-replication-group"
+  description                = "Test replication group"
+  node_type                  = "cache.t2.micro"
+  num_cache_clusters         = 2
+  parameter_group_name       = "default.redis7"
   
-  # Attributes to validate for policy
-  snapshot_retention_limit = 5
-  snapshot_window          = "05:00-09:00"
-  engine                   = "redis"
+  # Attribute to validate: snapshot_retention_limit
+  snapshot_retention_limit   = 7
+  
+  # Additional optional attributes mentioned in requirements
+  snapshot_window            = "05:00-09:00"
   automatic_failover_enabled = true
-  num_cache_clusters       = 2
+  port                       = 6379
+  engine                     = "redis"
 }

@@ -1,25 +1,26 @@
-# Test aws_redshift_cluster resource with legacy logging block
-resource "aws_redshift_cluster" "test_with_logging" {
-  cluster_identifier = "test-cluster-with-logging"
+provider "aws" {
+  region = "us-east-1"
+}
+
+# Test configuration for aws_redshift_cluster
+resource "aws_redshift_cluster" "validation_test" {
+  cluster_identifier = "test-cluster"
   node_type         = "dc2.large"
-  master_username   = "admin"
+  master_username   = "testuser"
   master_password   = "TestPassword123!"
   
-  # Legacy logging configuration (if supported)
-  # logging {
-  #   enable = true
-  # }
+  # Optional but commonly used attributes
+  database_name     = "testdb"
+  cluster_type      = "single-node"
+  
+  # Skip snapshot identifier to avoid complications
+  skip_final_snapshot = true
 }
 
-# Test aws_redshift_cluster resource without logging (for validation)
-resource "aws_redshift_cluster" "test_without_logging" {
-  cluster_identifier = "test-cluster-without-logging"
-  node_type         = "dc2.large"
-  master_username   = "admin"
-  master_password   = "TestPassword123!"
-}
-
-# Test aws_redshift_logging resource (modern approach)
-resource "aws_redshift_logging" "test_logging" {
-  cluster_identifier = aws_redshift_cluster.test_without_logging.cluster_identifier
+# Test configuration for aws_redshift_logging
+resource "aws_redshift_logging" "validation_test" {
+  cluster_identifier   = aws_redshift_cluster.validation_test.cluster_identifier
+  log_destination_type = "s3"
+  bucket_name         = "test-bucket"
+  s3_key_prefix       = "logs/"
 }

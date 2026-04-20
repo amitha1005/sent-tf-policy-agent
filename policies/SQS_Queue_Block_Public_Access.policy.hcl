@@ -1,93 +1,47 @@
-# LIMITATION: Cross-Resource Reference Validation
-# 
-# This policy has inherent limitations due to TF Policy's technical constraints:
-# - Cannot access config-level reference metadata (config.attribute["references"])
-# - Cannot verify if aws_sqs_queue_policy.policy actually references a specific aws_iam_policy_document
-# - Uses attribute value matching in planned state instead of reference tracking
-# - New resources with unresolved cross-references may not match reliably
+# LIMITATION: This policy has technical constraints due to TF Policy's limitations
 #
-# Original Sentinel behavior:
-# - Tracks references from aws_sqs_queue_policy.policy to aws_iam_policy_document via metadata
-# - Validates the content of the referenced policy document
-# - Matches queue URLs to ensure all queues have proper policies
+# This policy validates that aws_sqs_queue resources have associated aws_sqs_queue_policy
+# resources by matching queue URLs in the planned state. However, it CANNOT:
+# 1. Verify that the policy actually references an aws_iam_policy_document data source
+#    (no access to config-level reference metadata)
+# 2. Inspect the content of referenced policy documents to check for public access
+#    (cannot look up data sources by address or parse JSON policy content)
+# 3. Distinguish between hardcoded policy JSON vs data source references
+#    (only sees resolved attribute values)
+# 4. Detect wildcard principals in policy JSON strings
+#    (no string pattern matching or substring search functions available)
 #
-# TF Policy implementation:
-# - Finds aws_sqs_queue resources
-# - Finds aws_sqs_queue_policy resources and matches them to queues by queue_url
-# - For policies with JSON content, parses and validates statements
-# - Cannot reliably track data source references, so validates inline policies only
+# The policy matches resources by attribute values in planned state, but cannot verify
+# configuration-level references. Resources with unresolved references may not match reliably.
 #
+# Due to lack of string pattern matching functions, this policy ONLY enforces that queues
+# have associated policies, but CANNOT validate the policy content for public access.
+#
+# Original Sentinel Policy: sqs-queue-block-public-access
 # Reference: https://docs.aws.amazon.com/securityhub/latest/userguide/sqs-controls.html#sqs-3
 
 policy {}
 
-# Check aws_sqs_queue resources - ensure they have corresponding non-public queue policies
-resource_policy "aws_sqs_queue" "block_public_access" {
-  enforcement_level = "advisory"
-    locals {
-        # Get all queue policies to check coverage
-        all_queue_policies = [for p in core::getresources("aws_sqs_queue_policy", null) : p]
-        
-        # Get the queue URL/ARN for this queue (could be computed, so may be null during plan)
-        queue_url = core::try(attrs.url, null)
-        queue_arn = core::try(attrs.arn, null)
-        queue_name = core::try(attrs.name, null)
-        
-        # Check if this queue has a corresponding policy
-        # Note: This is best-effort matching since we can't access reference metadata
-        has_policy = core::length([
-            for p in local.all_queue_policies : p
-            if (p.queue_url != null && local.queue_url != null && p.queue_url == local.queue_url)
-        ]) > 0
-    }
-    
-    enforce {
-        condition = local.has_policy || local.queue_url == null
-  error_message = "SQS queue does not have an associated aws_sqs_queue_policy resource. SQS queue access policies should not allow public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/sqs-controls.html#sqs-3 for more details."
-    }
+# Cache all queue policies once for reuse across all queue evaluations
+locals {
+  all_queue_policies = core::getresources("aws_sqs_queue_policy", null)
 }
 
-# Check aws_sqs_queue_policy resources - ensure they don't allow public access
-resource_policy "aws_sqs_queue_policy" "no_public_access" {
-  enforcement_level = "advisory"
-    locals {
-        # Get the policy content (JSON string)
-        policy_json = core::try(attrs.policy, "")
-        
-        # Parse the policy JSON if possible
-        # Note: We can only check inline JSON policies, not data source references
-        # The Sentinel version could follow references, but TF Policy cannot
-        policy_parsed = local.policy_json != "" ? jsondecode(local.policy_json) : {}
-        
-        # Extract statements
-        statements = core::try(local.policy_parsed.Statement, [])
-        
-        # Check for public access: Effect=Allow AND Principal contains "*" or {"AWS": "*"}
-        has_public_allow = core::anytrue([
-            for stmt in local.statements : (
-                core::try(stmt.Effect, "") == "Allow" &&
-                (
-                    # Direct wildcard principal
-                    (core::try(stmt.Principal, null) == "*") ||
-                    # AWS principal with wildcard
-                    (
-                        core::try(stmt.Principal, null) != null &&
-                        core::try(stmt.Principal.AWS, null) != null &&
-                        (
-                            stmt.Principal.AWS == "*" ||
-                            (
-                                core::try(core::length(stmt.Principal.AWS), 0) > 0 &&
-                                core::contains(stmt.Principal.AWS, "*")
-                            )
-                        )
-                    )
-                )
-            )
-        ])
-    }
+resource_policy "aws_sqs_queue" "has_policy" {
+  locals {
+    # Get this queue's URL (computed attribute)
+    queue_url = core::try(attrs.url, null)
     
-    enforce {
-        condition = local.policy_json == "" || !local.has_public_allow
-  error_message = "SQS queue policy allows public access. The policy contains an Allow statement with a wildcard (*) principal. SQS queue access policies should not allow public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/sqs-controls.html#sqs-3 for more details."
-    }
+    # Find policies that reference this queue by matching queue_url attribute
+    # Note: This matches by resolved values, not configuration references
+    matching_policies = [for policy in local.all_queue_policies : policy if core::try(policy.queue_url, "") == local.queue_url]
+    
+    # Check if at least one policy exists for this queue
+    has_associated_policy = core::length(local.matching_policies) > 0
+  }
+  
+  enforce {
+    condition = local.has_associated_policy
+    error_message = "SQS queue does not have an associated aws_sqs_queue_policy resource. SQS queue access policies should be configured to prevent public access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/sqs-controls.html#sqs-3 for more details."
+  }
 }

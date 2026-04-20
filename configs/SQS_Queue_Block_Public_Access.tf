@@ -1,29 +1,36 @@
-resource "aws_sqs_queue" "public_access_validation" {
-  name = "test-queue-block-public-access"
+provider "aws" {
+  region = "us-east-1"
 }
 
-data "aws_iam_policy_document" "queue_policy" {
-  statement {
-    effect = "Allow"
+# Validate aws_sqs_queue resource
+resource "aws_sqs_queue" "validation_test" {
+  name = "test-queue"
+}
 
+# Validate aws_sqs_queue_policy resource
+resource "aws_sqs_queue_policy" "validation_test" {
+  queue_url = aws_sqs_queue.validation_test.url
+  policy    = data.aws_iam_policy_document.validation_test.json
+}
+
+# Validate aws_iam_policy_document data source
+data "aws_iam_policy_document" "validation_test" {
+  statement {
+    sid    = "TestStatement"
+    effect = "Allow"
+    
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::123456789012:root"]
     }
-
+    
     actions = [
-      "sqs:GetQueueAttributes",
-      "sqs:GetQueueUrl",
       "sqs:SendMessage",
+      "sqs:ReceiveMessage"
     ]
-
+    
     resources = [
-      aws_sqs_queue.public_access_validation.arn,
+      aws_sqs_queue.validation_test.arn
     ]
   }
-}
-
-resource "aws_sqs_queue_policy" "public_access_validation" {
-  queue_url = aws_sqs_queue.public_access_validation.id
-  policy    = data.aws_iam_policy_document.queue_policy.json
 }
