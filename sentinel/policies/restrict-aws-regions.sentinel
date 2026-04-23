@@ -1,0 +1,24 @@
+# Sentinel Policy: Restrict AWS Regions
+# This policy ensures AWS resources are only deployed in approved regions.
+
+import "tfplan/v2" as tfplan
+
+allowed_regions = [
+  "us-east-1",
+  "us-west-2",
+  "eu-west-1",
+]
+
+aws_providers = filter tfplan.providers as _, provider {
+  provider.name contains "aws"
+}
+
+region_allowed = rule {
+  all aws_providers as _, provider {
+    provider.config.region.constant_value in allowed_regions
+  }
+}
+
+main = rule {
+  region_allowed
+}
