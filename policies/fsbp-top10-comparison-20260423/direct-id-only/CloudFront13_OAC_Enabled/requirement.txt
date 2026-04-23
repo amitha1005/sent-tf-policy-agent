@@ -1,0 +1,60 @@
+CloudFront.13 - CloudFront distributions should use origin access control
+
+Policy Type: tfpolicy
+
+Detailed Description:
+
+Control ID: CloudFront.13
+Title: [CloudFront.13] CloudFront distributions should use origin access control
+Source: AWS Security Hub - NIST 800 171 REV2
+Resource Type: AWS::CloudFront::Distribution
+Category: Protect > Secure access management > Resource not publicly accessible
+Severity: Medium
+
+AWS Config rule: cloudfront-s3-origin-access-control-enabled
+Schedule type: Change triggered
+
+This control checks whether an Amazon CloudFront distribution with an Amazon S3 origin has origin access control (OAC) configured. The control fails if OAC isn't configured for the CloudFront distribution.
+
+When using an S3 bucket as an origin for your CloudFront distribution, you can enable OAC. This permits access to the content in the bucket only through the specified CloudFront distribution, and prohibits access directly from the bucket or another distribution. Although CloudFront supports Origin Access Identity (OAI), OAC offers additional functionality, and distributions using OAI can migrate to OAC. While OAI provides a secure way to access S3 origins, it has limitations, such as lack of support for granular policy configurations and for HTTP/HTTPS requests that use the POST method in AWS Regions that require AWS Signature Version 4 (SigV4). OAI also doesn't support encryption with AWS Key Management Service. OAC is based on an AWS best practice of using IAM service principals to authenticate with S3 origins.
+
+Remediation:
+To configure OAC for a CloudFront distribution with S3 origins, see Restricting access to an Amazon S3 origin in the Amazon CloudFront Developer Guide.
+
+Related Terraform Resources:
+
+1. Resource Type: aws_cloudfront_distribution
+   Description: Provides a CloudFront web distribution resource
+   Key Arguments for OAC Compliance:
+   - origin (Required): Configuration block for the distribution's origins
+     - origin_access_control_id (Optional): Unique identifier of a CloudFront origin access control for this origin
+     - domain_name (Required): DNS domain name of the S3 bucket origin
+     - origin_id (Required): Unique identifier for the origin
+   - enabled (Required): Whether the distribution is enabled to accept end user requests for content
+   - default_cache_behavior (Required): Default cache behavior for this distribution
+     - target_origin_id (Required): Value of ID for the origin that you want CloudFront to route requests to
+     - viewer_protocol_policy (Required): Protocol that users can use to access files
+     - allowed_methods (Required): Controls which HTTP methods CloudFront processes
+     - cached_methods (Required): Controls whether CloudFront caches the response
+   - restrictions (Required): The restriction configuration for this distribution
+   - viewer_certificate (Required): The SSL configuration for this distribution
+
+2. Resource Type: aws_cloudfront_origin_access_control
+   Description: Terraform resource for managing an AWS CloudFront Origin Access Control
+   Key Arguments:
+   - name (Required): A name that identifies the Origin Access Control
+   - description (Optional): The description of the Origin Access Control
+   - origin_access_control_origin_type (Required): The type of origin that this Origin Access Control is for. Valid values are 'lambda', 'mediapackagev2', 'mediastore', and 's3'
+   - signing_behavior (Required): Specifies which requests CloudFront signs. Specify 'always' for the most common use case. Allowed values: 'always', 'never', and 'no-override'
+   - signing_protocol (Required): Determines how CloudFront signs (authenticates) requests. The only valid value is 'sigv4'
+   Output Attributes:
+   - id: The unique identifier of this Origin Access Control
+   - arn: The Origin Access Control ARN
+   - etag: The current version of this Origin Access Control
+
+Policy Evaluation Logic:
+The policy must verify that CloudFront distributions with S3 origins have the origin_access_control_id attribute configured in their origin blocks. Specifically:
+- Check if the resource type is aws_cloudfront_distribution
+- For each origin block within the distribution, verify if it has an S3 domain_name (typically ends with .s3.amazonaws.com or .s3.<region>.amazonaws.com)
+- If an S3 origin is detected, ensure that origin_access_control_id is present and references a valid aws_cloudfront_origin_access_control resource
+- The control fails if any S3 origin lacks the origin_access_control_id configuration

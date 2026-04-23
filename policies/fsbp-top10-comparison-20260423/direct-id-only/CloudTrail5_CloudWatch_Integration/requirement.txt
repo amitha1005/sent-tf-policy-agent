@@ -1,0 +1,72 @@
+CloudTrail.5 - CloudTrail trails should be integrated with Amazon CloudWatch Logs
+
+Policy Type: tfpolicy
+
+Detailed Description:
+
+Control ID: CloudTrail.5
+Title: [CloudTrail.5] CloudTrail trails should be integrated with Amazon CloudWatch Logs
+Source: AWS Security Hub
+Resource Type: AWS::CloudTrail::Trail
+Compliance Frameworks: pci_dss_v3.2.1
+
+Related requirements: CIS AWS Foundations Benchmark v5.0.0/3.4, PCI DSS v3.2.1/10.5.3, CIS AWS Foundations Benchmark v1.2.0/2.4, CIS AWS Foundations Benchmark v1.4.0/3.4, NIST.800-53.r5 AC-2(4), NIST.800-53.r5 AC-4(26), NIST.800-53.r5 AC-6(9), NIST.800-53.r5 AU-10, NIST.800-53.r5 AU-12, NIST.800-53.r5 AU-2, NIST.800-53.r5 AU-3, NIST.800-53.r5 AU-6(1), NIST.800-53.r5 AU-6(3), NIST.800-53.r5 AU-6(4), NIST.800-53.r5 AU-6(5), NIST.800-53.r5 AU-7(1), NIST.800-53.r5 CA-7, NIST.800-53.r5 SC-7(9), NIST.800-53.r5 SI-20, NIST.800-53.r5 SI-3(8), NIST.800-53.r5 SI-4(20), NIST.800-53.r5 SI-4(5), NIST.800-53.r5 SI-7(8)
+
+Category: Identify > Logging
+
+Severity: Medium
+
+Resource type: AWS::CloudTrail::Trail
+
+AWS Config rule: cloud-trail-cloud-watch-logs-enabled
+
+Schedule type: Periodic
+
+Parameters: None
+
+This control checks whether CloudTrail trails are configured to send logs to CloudWatch Logs. The control fails if the CloudWatchLogsLogGroupArn property of the trail is empty.
+
+CloudTrail records AWS API calls that are made in a given account. The recorded information includes the following:
+- The identity of the API caller
+- The time of the API call
+- The source IP address of the API caller
+- The request parameters
+- The response elements returned by the AWS service
+
+CloudTrail uses Amazon S3 for log file storage and delivery. You can capture CloudTrail logs in a specified S3 bucket for long-term analysis. To perform real-time analysis, you can configure CloudTrail to send logs to CloudWatch Logs.
+
+For a trail that is enabled in all Regions in an account, CloudTrail sends log files from all of those Regions to a CloudWatch Logs log group.
+
+Security Hub CSPM recommends that you send CloudTrail logs to CloudWatch Logs. Note that this recommendation is intended to ensure that account activity is captured, monitored, and appropriately alarmed on. You can use CloudWatch Logs to set this up with your AWS services. This recommendation does not preclude the use of a different solution.
+
+Sending CloudTrail logs to CloudWatch Logs facilitates real-time and historic activity logging based on user, API, resource, and IP address. You can use this approach to establish alarms and notifications for anomalous or sensitivity account activity.
+
+Remediation: To integrate CloudTrail with CloudWatch Logs, see Sending events to CloudWatch Logs in the AWS CloudTrail User Guide.
+
+Related Terraform Resources:
+
+1. Resource Type: aws_cloudtrail
+   Description: Provides a CloudTrail resource for logging AWS API calls
+   Key Arguments:
+   - name (Required): Name of the trail
+   - s3_bucket_name (Required): Name of the S3 bucket designated for publishing log files
+   - cloud_watch_logs_group_arn (Optional): Log group name using an ARN that represents the log group to which CloudTrail logs will be delivered. Note that CloudTrail requires the Log Stream wildcard (e.g., "${aws_cloudwatch_log_group.example.arn}:*")
+   - cloud_watch_logs_role_arn (Optional): Role for the CloudWatch Logs endpoint to assume to write to a user's log group
+   - enable_logging (Optional): Enables logging for the trail. Defaults to true
+   - is_multi_region_trail (Optional): Whether the trail is created in the current region or in all regions. Defaults to false
+   - include_global_service_events (Optional): Whether the trail is publishing events from global services such as IAM to the log files. Defaults to true
+
+2. Resource Type: aws_cloudwatch_log_group
+   Description: Provides a CloudWatch Log Group resource for receiving CloudTrail logs
+   Key Arguments:
+   - name (Optional): The name of the log group. If omitted, Terraform will assign a random, unique name
+   - name_prefix (Optional): Creates a unique name beginning with the specified prefix
+   - retention_in_days (Optional): Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653, and 0
+   - kms_key_id (Optional): The ARN of the KMS Key to use when encrypting log data
+   - tags (Optional): A map of tags to assign to the resource
+
+Clarifications:
+- The policy specifically checks that the CloudWatchLogsLogGroupArn property is not empty on the CloudTrail trail resource
+- Both cloud_watch_logs_group_arn and cloud_watch_logs_role_arn should be configured on the aws_cloudtrail resource for proper CloudWatch Logs integration
+- The cloud_watch_logs_group_arn must include the ":*" wildcard suffix as required by CloudTrail API
+- The policy does not validate whether the log group exists or is properly configured, only that the integration is configured on the trail

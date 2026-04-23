@@ -1,0 +1,64 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An IAM user policy with kms:Decrypt action on specific KMS key ARN",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Resource is restricted to specific key"
+    },
+    {
+      "given": "An IAM user policy with kms:Decrypt action on all KMS keys (Resource: *)",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because Resource allows all keys"
+    },
+    {
+      "given": "An IAM user policy with kms:ReEncryptFrom action on all KMS keys",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because Resource allows all keys"
+    },
+    {
+      "given": "An IAM user policy with kms:* action on all KMS keys",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because wildcard action with Resource: *"
+    },
+    {
+      "given": "An IAM user policy with multiple statements, one allowing kms:Decrypt on *",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because at least one statement violates the rule"
+    },
+    {
+      "given": "An IAM role policy with kms:Decrypt action on specific KMS key ARN",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Resource is restricted"
+    },
+    {
+      "given": "An IAM role policy with kms:ReEncryptFrom action on all KMS keys",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because Resource allows all keys"
+    },
+    {
+      "given": "An IAM group policy with kms:Decrypt action on specific KMS key ARN",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Resource is restricted"
+    },
+    {
+      "given": "An IAM group policy with kms:* action on all KMS keys",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because wildcard action with Resource: *"
+    },
+    {
+      "given": "An IAM user policy with Action as array containing kms:Decrypt and Resource as array containing *",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because Resource array contains wildcard"
+    },
+    {
+      "given": "An IAM user policy with S3 permissions only (no KMS actions)",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because no blocked KMS actions present"
+    },
+    {
+      "given": "An IAM role policy with kms:Decrypt on specific key and Condition element",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Resource is specific (Condition is ignored per spec)"
+    }
+  ]
+}

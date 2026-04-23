@@ -1,0 +1,71 @@
+Lambda.2 - Lambda functions should use supported runtimes
+
+Policy Type: tfpolicy
+
+Detailed Description:
+
+Control ID: Lambda.2
+Title: [Lambda.2] Lambda functions should use supported runtimes
+Source: AWS Security Hub - PCI DSS v4.0.1
+Resource Type: AWS::Lambda::Function
+Category: Protect > Secure development
+Severity: Medium
+
+AWS Config rule: lambda-function-settings-check
+Schedule type: Change triggered
+
+Parameters:
+runtime: dotnet10, dotnet8, java25, java21, java17, java11, java8.al2, nodejs24.x, nodejs22.x, nodejs20.x, python3.14, python3.13, python3.12, python3.11, python3.10, ruby3.4, ruby3.3, ruby3.2 (not customizable)
+
+This control checks whether AWS Lambda function runtime settings match the expected values set for the supported runtimes in each language. The control fails if the Lambda function doesn't use a supported runtime, as noted in the Parameters section. Security Hub CSPM ignores functions that have a package type of Image.
+
+Lambda runtimes are built around a combination of operating system, programming language, and software libraries that are subject to maintenance and security updates. When a runtime component is no longer supported for security updates, Lambda deprecates the runtime. Even though you can't create functions that use the deprecated runtime, the function is still available to process invocation events. We recommend ensuring that your Lambda functions are current and don't use deprecated runtime environments. For a list of supported runtimes, see Lambda runtimes in the AWS Lambda Developer Guide.
+
+Related Requirements:
+- NIST.800-53.r5 CA-9(1)
+- NIST.800-53.r5 CM-2
+- NIST.800-53.r5 SI-2
+- NIST.800-53.r5 SI-2(2)
+- NIST.800-53.r5 SI-2(4)
+- NIST.800-53.r5 SI-2(5)
+- PCI DSS v4.0.1/12.3.4
+
+Remediation:
+For more information about supported runtimes and deprecation schedules, see Runtime deprecation policy in the AWS Lambda Developer Guide. When you migrate your runtimes to the latest version, follow the syntax and guidance from the publishers of the language. We also recommend applying runtime updates to help reduce the risk of impact to your workloads in the rare event of a runtime version incompatibility.
+
+Related Terraform Resources:
+
+1. Resource Type: aws_lambda_function
+   Description: Manages an AWS Lambda Function
+   Key Arguments for Runtime Compliance:
+   - runtime (Optional): Identifier of the function's runtime. Required if package_type is Zip
+     Valid supported values (as of policy specification):
+     * .NET: dotnet10, dotnet8
+     * Java: java25, java21, java17, java11, java8.al2
+     * Node.js: nodejs24.x, nodejs22.x, nodejs20.x
+     * Python: python3.14, python3.13, python3.12, python3.11, python3.10
+     * Ruby: ruby3.4, ruby3.3, ruby3.2
+   - package_type (Optional): Lambda deployment package type. Valid values are Zip and Image. Defaults to Zip
+   - function_name (Required): Unique name for your Lambda Function
+   - role (Required): ARN of the function's execution role
+   - handler (Optional): Function entry point in your code. Required if package_type is Zip
+   
+   Output Attributes:
+   - arn: ARN identifying your Lambda Function
+   - version: Latest published version of your Lambda Function
+   - last_modified: Date this resource was last modified
+   - source_code_size: Size in bytes of the function .zip file
+
+Policy Evaluation Logic:
+The policy must verify that Lambda functions use supported runtimes. Specifically:
+- Check if the resource type is aws_lambda_function
+- Verify the package_type attribute:
+  * If package_type is "Image" (container-based), SKIP evaluation (as per Security Hub CSPM behavior)
+  * If package_type is "Zip" or unspecified (defaults to "Zip"), proceed with runtime validation
+- For Zip package types, ensure the runtime attribute is present and matches one of the supported runtime values listed in the Parameters section
+- The control fails if:
+  * A Zip-based Lambda function has no runtime specified (when required)
+  * A Zip-based Lambda function uses a runtime value not in the supported list
+  * A Zip-based Lambda function uses a deprecated runtime
+
+Note: The list of supported runtimes should be regularly updated to reflect AWS Lambda's current runtime support. Deprecated runtimes should be removed from the supported list as AWS announces their deprecation.

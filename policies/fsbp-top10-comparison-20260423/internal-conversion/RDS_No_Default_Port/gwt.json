@@ -1,0 +1,54 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An aws_db_instance with mysql engine and non-default port 3307",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because port is not default"
+    },
+    {
+      "given": "An aws_db_instance with mysql engine and default port 3306",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because port matches default"
+    },
+    {
+      "given": "An aws_db_instance with postgres engine and non-default port 5433",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because port is not default"
+    },
+    {
+      "given": "An aws_db_instance with postgres engine and default port 5432",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because port matches default"
+    },
+    {
+      "given": "An aws_db_instance with mysql engine and no port specified",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because port is not configured"
+    },
+    {
+      "given": "An aws_rds_cluster with aurora-mysql engine and non-default port 3307",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because port is not default"
+    },
+    {
+      "given": "An aws_rds_cluster with aurora-mysql engine and default port 3306",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because port matches default"
+    },
+    {
+      "given": "An aws_rds_cluster with aurora-postgresql engine and non-default port 5433",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because port is not default"
+    },
+    {
+      "given": "An aws_rds_cluster with aurora-postgresql engine and default port 5432",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because port matches default"
+    },
+    {
+      "given": "An aws_rds_cluster with aurora-mysql engine and no port specified",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because port is not configured"
+    }
+  ]
+}

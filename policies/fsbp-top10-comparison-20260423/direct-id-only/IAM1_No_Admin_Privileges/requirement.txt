@@ -1,0 +1,106 @@
+IAM.1 - IAM policies should not allow full "*" administrative privileges
+
+Policy Type: tfpolicy
+
+Detailed Description:
+Control ID: IAM.1
+Title: [IAM.1] IAM policies should not allow full "*" administrative privileges
+Source: AWS Security Hub
+Resource Type: AWS::IAM::Policy
+Compliance Frameworks: CIS AWS Foundations Benchmark v1.2.0/1.22, CIS AWS Foundations Benchmark v1.4.0/1.16, NIST.800-53.r5 AC-2, NIST.800-53.r5 AC-2(1), NIST.800-53.r5 AC-3, NIST.800-53.r5 AC-3(15), NIST.800-53.r5 AC-3(7), NIST.800-53.r5 AC-5, NIST.800-53.r5 AC-6, NIST.800-53.r5 AC-6(10), NIST.800-53.r5 AC-6(2), NIST.800-53.r5 AC-6(3), NIST.800-171.r2 3.1.4, PCI DSS v3.2.1/7.2.1
+
+Category: Protect > Secure access management
+Severity: High
+AWS Config rule: iam-policy-no-statements-with-admin-access
+Schedule type: Change triggered
+
+Parameters:
+- excludePermissionBoundaryPolicy: true (not customizable)
+
+Policy Specification:
+This control checks whether the default version of IAM policies (also known as customer managed policies) has administrator access by including a statement with "Effect": "Allow" with "Action": "*" over "Resource": "*". The control fails if you have IAM policies with such a statement.
+
+The control only checks the customer managed policies that you create. It does not check inline and AWS managed policies.
+
+IAM policies define a set of privileges that are granted to users, groups, or roles. Following standard security advice, AWS recommends that you grant least privilege, which means to grant only the permissions that are required to perform a task. When you provide full administrative privileges instead of the minimum set of permissions that the user needs, you expose the resources to potentially unwanted actions.
+
+Instead of allowing full administrative privileges, determine what users need to do and then craft policies that let the users perform only those tasks. It is more secure to start with a minimum set of permissions and grant additional permissions as necessary. Do not start with permissions that are too lenient and then try to tighten them later.
+
+You should remove IAM policies that have a statement with "Effect": "Allow" with "Action": "*" over "Resource": "*".
+
+Note: AWS Config should be enabled in all Regions in which you use Security Hub CSPM. However, global resource recording can be enabled in a single Region. If you only record global resources in a single Region, then you can disable this control in all Regions except the Region where you record global resources.
+
+Remediation:
+To modify your IAM policies so that they do not allow full "*" administrative privileges, see "Editing IAM policies" in the IAM User Guide.
+
+Related Terraform Resources:
+
+1. Resource Type: aws_iam_policy
+   Description: Provides an IAM policy (customer managed policy)
+   Key Arguments:
+   - name (Optional, Forces new resource): Name of the policy. If omitted, Terraform will assign a random, unique name.
+   - name_prefix (Optional, Forces new resource): Creates a unique name beginning with the specified prefix. Conflicts with name.
+   - path (Optional, default "/"): Path in which to create the policy.
+   - policy (Required): Policy document. This is a JSON formatted string containing the policy statements.
+   - description (Optional, Forces new resource): Description of the IAM policy.
+   - tags (Optional): Map of resource tags for the IAM Policy.
+   Key Attributes:
+   - arn: ARN assigned by AWS to this policy.
+   - id: ARN assigned by AWS to this policy.
+   - policy_id: Policy's ID.
+   - attachment_count: Number of entities (users, groups, and roles) that the policy is attached to.
+
+2. Resource Type: aws_iam_role_policy
+   Description: Provides an IAM role inline policy
+   Key Arguments:
+   - name (Optional): The name of the role policy. If omitted, Terraform will assign a random, unique name.
+   - name_prefix (Optional): Creates a unique name beginning with the specified prefix. Conflicts with name.
+   - policy (Required): The inline policy document. This is a JSON formatted string containing the policy statements.
+   - role (Required): The name of the IAM role to attach to the policy.
+   Key Attributes:
+   - id: The role policy ID in the form of role_name:role_policy_name.
+
+3. Resource Type: aws_iam_user_policy
+   Description: Provides an IAM policy attached to a user (inline policy)
+   Key Arguments:
+   - name (Optional): The name of the policy. If omitted, Terraform will assign a random, unique name.
+   - name_prefix (Optional, Forces new resource): Creates a unique name beginning with the specified prefix. Conflicts with name.
+   - policy (Required): The policy document. This is a JSON formatted string containing the policy statements.
+   - user (Required): IAM user to which to attach this policy.
+   Key Attributes:
+   - id: The user policy ID, in the form of user_name:user_policy_name.
+   - name: The name of the policy (always set).
+
+4. Resource Type: aws_iam_group_policy
+   Description: Provides an IAM policy attached to a group (inline policy)
+   Key Arguments:
+   - name (Optional): The name of the policy. If omitted, Terraform will assign a random, unique name.
+   - name_prefix (Optional): Creates a unique name beginning with the specified prefix. Conflicts with name.
+   - policy (Required): The policy document. This is a JSON formatted string containing the policy statements.
+   - group (Required): The IAM group to attach to the policy.
+   Key Attributes:
+   - id: The group policy ID.
+   - group: The group to which this policy applies.
+   - name: The name of the policy.
+   - policy: The policy document attached to the group.
+
+5. Resource Type: aws_iam_policy_attachment
+   Description: Attaches a Managed IAM Policy to user(s), role(s), and/or group(s)
+   Key Arguments:
+   - name (Required): The name of the attachment.
+   - users (Optional): The user(s) the policy should be applied to.
+   - roles (Optional): The role(s) the policy should be applied to.
+   - groups (Optional): The group(s) the policy should be applied to.
+   - policy_arn (Required): The ARN of the policy you want to apply.
+   Key Attributes:
+   - id: The policy's ID.
+   - name: The name of the attachment.
+
+Clarifications:
+- The control specifically targets customer managed policies (aws_iam_policy resources) as the primary evaluation target.
+- Inline policies attached to roles (aws_iam_role_policy), users (aws_iam_user_policy), and groups (aws_iam_group_policy) should also be evaluated to ensure comprehensive coverage, even though the AWS Config rule focuses on customer managed policies.
+- The policy check should identify any policy statement where all three conditions are met simultaneously:
+  1. "Effect": "Allow"
+  2. "Action": "*" (or ["*"])
+  3. "Resource": "*" (or ["*"])
+- The policy should fail if ANY statement in the policy document contains this combination, regardless of other statements present.

@@ -1,0 +1,39 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An aws_iam_policy_document with no KMS actions",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass"
+    },
+    {
+      "given": "An aws_iam_policy_document with kms:Decrypt action",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    },
+    {
+      "given": "An aws_iam_policy_document with kms:ReEncryptFrom action",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    },
+    {
+      "given": "An aws_iam_policy_document with both kms:Decrypt and kms:ReEncryptFrom actions",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    },
+    {
+      "given": "An aws_iam_policy_document with other KMS actions (not Decrypt or ReEncryptFrom)",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass"
+    },
+    {
+      "given": "An aws_iam_policy_document with multiple statements, one containing kms:Decrypt",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    },
+    {
+      "given": "An aws_iam_policy_document with empty statement list",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An ECS task definition with network_mode set to 'awsvpc' (not host)",
+      "when": "The policy is evaluated",
+      "then": "The policy should PASS because non-host network modes are not restricted"
+    },
+    {
+      "given": "An ECS task definition with network_mode set to 'bridge' (not host)",
+      "when": "The policy is evaluated",
+      "then": "The policy should PASS because non-host network modes are not restricted"
+    },
+    {
+      "given": "An ECS task definition with host network mode and a container with privileged=true",
+      "when": "The policy is evaluated",
+      "then": "The policy should PASS because explicit privileged=true is a secure configuration"
+    },
+    {
+      "given": "An ECS task definition with host network mode and a container with user set to 'appuser' (non-root)",
+      "when": "The policy is evaluated",
+      "then": "The policy should PASS because non-root user is a secure configuration"
+    },
+    {
+      "given": "An ECS task definition with host network mode and a container with user set to '1000' (numeric UID)",
+      "when": "The policy is evaluated",
+      "then": "The policy should PASS because numeric non-zero UID is a non-root user"
+    },
+    {
+      "given": "An ECS task definition with host network mode and a container with privileged=false and user='root'",
+      "when": "The policy is evaluated",
+      "then": "The policy should FAIL because the container runs as root without elevated privileges"
+    },
+    {
+      "given": "An ECS task definition with host network mode and a container with privileged=false and no user specified",
+      "when": "The policy is evaluated",
+      "then": "The policy should FAIL because the container lacks both privileged and non-root user configuration"
+    },
+    {
+      "given": "An ECS task definition with host network mode and a container with no privileged field and user='root'",
+      "when": "The policy is evaluated",
+      "then": "The policy should FAIL because privileged defaults to false and user is root"
+    },
+    {
+      "given": "An ECS task definition with host network mode and a container with no privileged field and no user field",
+      "when": "The policy is evaluated",
+      "then": "The policy should FAIL because both privileged and user are missing (defaults are insecure)"
+    },
+    {
+      "given": "An ECS task definition with host network mode and multiple containers where one is secure and one is insecure",
+      "when": "The policy is evaluated",
+      "then": "The policy should FAIL because ANY insecure container causes the entire task definition to fail"
+    },
+    {
+      "given": "An ECS task definition with host network mode and multiple containers where all are secure (mix of privileged=true and non-root users)",
+      "when": "The policy is evaluated",
+      "then": "The policy should PASS because ALL containers have secure configurations"
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+AWS Security Hub Control: ELB.1
+Application Load Balancer HTTP to HTTPS Redirection
+
+Policy Type: tfpolicy
+
+=============================================================================
+DETAILED DESCRIPTION
+=============================================================================
+
+Control ID: ELB.1
+Title: [ELB.1] Application Load Balancer should be configured to redirect all HTTP requests to HTTPS
+Source: AWS Security Hub
+Resource Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+Compliance Frameworks: pci_dss_v3.2.1
+
+Related requirements: PCI DSS v3.2.1/2.3, PCI DSS v3.2.1/4.1, NIST.800-53.r5 AC-17(2), NIST.800-53.r5 AC-4, NIST.800-53.r5 IA-5(1), NIST.800-53.r5 SC-12(3), NIST.800-53.r5 SC-13, NIST.800-53.r5 SC-23, NIST.800-53.r5 SC-23(3), NIST.800-53.r5 SC-7(4), NIST.800-53.r5 SC-8, NIST.800-53.r5 SC-8(1), NIST.800-53.r5 SC-8(2), NIST.800-53.r5 SI-7(6)
+
+Category: Detect > Detection services
+Severity: Medium
+AWS Config rule: alb-http-to-https-redirection-check
+Schedule type: Periodic
+Parameters: None
+
+Policy Requirement:
+This control checks whether HTTP to HTTPS redirection is configured on all HTTP listeners of Application Load Balancers. The control fails if any of the HTTP listeners of Application Load Balancers do not have HTTP to HTTPS redirection configured.
+
+Before you start to use your Application Load Balancer, you must add one or more listeners. A listener is a process that uses the configured protocol and port to check for connection requests. Listeners support both the HTTP and HTTPS protocols. You can use an HTTPS listener to offload the work of encryption and decryption to your load balancer. To enforce encryption in transit, you should use redirect actions with Application Load Balancers to redirect client HTTP requests to an HTTPS request on port 443.
+
+To learn more, see Listeners for your Application Load Balancers in User Guide for Application Load Balancers.
+
+Remediation:
+To redirect HTTP requests to HTTPS, you must add an Application Load Balancer listener rule or edit an existing rule.
+
+For instructions on adding a new rule, see Add a rule in the User Guide for Application Load Balancers. For Protocol : Port, choose HTTP, and then enter 80. For Add action, Redirect to, choose HTTPS, and then enter 443.
+
+For instructions on editing an existing rule, see Edit a rule in the User Guide for Application Load Balancers. For Protocol : Port, choose HTTP, and then enter 80. For Add action, Redirect to, choose HTTPS, and then enter 443.
+
+Reference URL: https://docs.aws.amazon.com/securityhub/latest/userguide/elb-controls.html#elb-1
+
+=============================================================================
+RELATED TERRAFORM RESOURCES
+=============================================================================
+
+1. Resource Type: aws_lb
+   Description: Provides a Load Balancer resource (Application Load Balancer)
+   Key Arguments:
+   - name: (Optional) Name of the LB. Must be unique within AWS account, max 32 characters
+   - load_balancer_type: (Optional) Type of load balancer to create. Must be "application" for this control
+   - internal: (Optional) If true, the LB will be internal. Defaults to false
+   - security_groups: (Optional) List of security group IDs to assign to the LB. Only valid for Application Load Balancers
+   - subnets: (Optional) List of subnet IDs to attach to the LB
+   - subnet_mapping: (Optional) Subnet mapping block for more detailed configuration
+   - enable_deletion_protection: (Optional) If true, deletion of the load balancer will be disabled via AWS API
+   - enable_http2: (Optional) Whether HTTP/2 is enabled in application load balancers. Defaults to true
+   - idle_timeout: (Optional) Time in seconds that the connection is allowed to be idle. Default: 60
+   - ip_address_type: (Optional) Type of IP addresses used by the subnets. Possible values: ipv4, dualstack
+   - tags: (Optional) Map of tags to assign to the resource
+
+2. Resource Type: aws_lb_listener
+   Description: Provides a Load Balancer Listener resource that handles HTTP/HTTPS traffic
+   Key Arguments:
+   - load_balancer_arn: (Required, Forces New Resource) ARN of the load balancer
+   - port: (Optional) Port on which the load balancer is listening (e.g., 80 for HTTP, 443 for HTTPS)
+   - protocol: (Optional) Protocol for connections from clients. Valid values for ALB: HTTP and HTTPS
+   - default_action: (Required) Configuration block for default actions
+     * type: (Required) Type of routing action. Valid values: forward, redirect, fixed-response, authenticate-cognito, authenticate-oidc, jwt-validation
+     * redirect: (Optional) Configuration block for creating a redirect action. Required if type is "redirect"
+       - protocol: (Optional) Protocol. Valid values: HTTP, HTTPS, or #{protocol}. Defaults to #{protocol}
+       - port: (Optional) Port. Specify value from 1 to 65535 or #{port}. Defaults to #{port}
+       - status_code: (Required) HTTP redirect code. Either permanent (HTTP_301) or temporary (HTTP_302)
+       - host: (Optional) Hostname. Defaults to #{host}
+       - path: (Optional) Absolute path. Defaults to /#{path}
+       - query: (Optional) Query parameters. Defaults to #{query}
+     * target_group_arn: (Optional) ARN of Target Group to route traffic (when type is "forward")
+     * forward: (Optional) Configuration for distributing requests among target groups
+     * fixed_response: (Optional) Information for creating custom HTTP response
+   - certificate_arn: (Optional) ARN of default SSL server certificate. Required if protocol is HTTPS
+   - ssl_policy: (Optional) Name of SSL Policy for the listener. Required if protocol is HTTPS or TLS
+   - alpn_policy: (Optional) Name of Application-Layer Protocol Negotiation policy
+   - tags: (Optional) Map of tags to assign to the resource
+
+3. Resource Type: aws_lb_target_group
+   Description: Provides a Target Group resource for use with Load Balancers
+   Key Arguments:
+   - name: (Optional) Name of the target group
+   - port: (Optional) Port on which targets receive traffic
+   - protocol: (Optional) Protocol to use for routing traffic to targets
+   - vpc_id: (Optional) Identifier of the VPC in which to create the target group
+   - target_type: (Optional) Type of target. Valid values: instance, ip, lambda, alb
+   - health_check: (Optional) Health check configuration block
+   - stickiness: (Optional) Stickiness configuration block
+   - tags: (Optional) Map of tags to assign to the resource
+
+4. Resource Type: aws_lb_listener_rule
+   Description: Provides a Load Balancer Listener Rule resource for conditional routing
+   Key Arguments:
+   - listener_arn: (Required, Forces New Resource) ARN of the listener to attach rule to
+   - priority: (Optional) Priority for the rule between 1 and 50000
+   - action: (Required) Configuration block for actions
+     * type: (Required) Type of routing action (forward, redirect, fixed-response, etc.)
+     * redirect: (Optional) Redirect action configuration (same structure as listener default_action)
+   - condition: (Required) Configuration block for rule conditions
+     * host_header: (Optional) Host header condition
+     * path_pattern: (Optional) Path pattern condition
+     * http_request_method: (Optional) HTTP request method condition
+     * source_ip: (Optional) Source IP condition
+   - tags: (Optional) Map of tags to assign to the resource
+
+5. Resource Type: aws_lb_listener_certificate
+   Description: Provides a Load Balancer Listener Certificate resource for additional SSL certificates
+   Key Arguments:
+   - listener_arn: (Required, Forces New Resource) ARN of the listener to attach certificate to
+   - certificate_arn: (Required) ARN of the certificate to attach to the listener
+
+=============================================================================
+POLICY VALIDATION LOGIC
+=============================================================================
+
+To implement this control as a Terraform Policy (tfpolicy), the policy must:
+
+1. Identify all Application Load Balancers (aws_lb resources where load_balancer_type = "application")
+
+2. For each Application Load Balancer, find all associated HTTP listeners (aws_lb_listener resources where protocol = "HTTP" and port = 80)
+
+3. For each HTTP listener found, verify that:
+   - The default_action type is "redirect"
+   - The redirect configuration has:
+     * protocol set to "HTTPS" or "#{protocol}" with port "443"
+     * port set to "443" or "#{port}" with protocol "HTTPS"
+     * status_code set to either "HTTP_301" or "HTTP_302"
+
+4. The policy should PASS if:
+   - There are no HTTP listeners on port 80, OR
+   - All HTTP listeners on port 80 have proper redirect actions to HTTPS on port 443
+
+5. The policy should FAIL if:
+   - Any HTTP listener on port 80 exists without a redirect action to HTTPS
+   - Any HTTP listener has a redirect action but it does not target HTTPS:443
+
+Note: The policy only applies to Application Load Balancers (load_balancer_type = "application"), not Network Load Balancers or Gateway Load Balancers.

@@ -1,0 +1,95 @@
+RDS.23 - RDS instances should not use a database engine default port
+
+Policy Type: tfpolicy
+
+Detailed Description:
+
+Control ID: RDS.23
+Title: [RDS.23] RDS instances should not use a database engine default port
+Source: AWS Security Hub - NIST 800 53 REV5
+Resource Type: AWS::RDS::DBInstance
+Category: Protect > Secure network configuration
+Severity: Low
+
+Full Policy Specification:
+
+This control checks whether an RDS cluster or instance uses a port other than the default port of the database engine. The control fails if the RDS cluster or instance uses the default port. This control doesn't apply to RDS instances that are part of a cluster.
+
+If you use a known port to deploy an RDS cluster or instance, an attacker can guess information about the cluster or instance. The attacker can use this information in conjunction with other information to connect to an RDS cluster or instance or gain additional information about your application.
+
+When you change the port, you must also update the existing connection strings that were used to connect to the old port. You should also check the security group of the DB instance to ensure that it includes an ingress rule that allows connectivity on the new port.
+
+Related Requirements: NIST.800-53.r5 AC-4, NIST.800-53.r5 AC-4(21), NIST.800-53.r5 SC-7, NIST.800-53.r5 SC-7(11), NIST.800-53.r5 SC-7(16), NIST.800-53.r5 SC-7(21), NIST.800-53.r5 SC-7(4), NIST.800-53.r5 SC-7(5)
+
+AWS Config rule: rds-no-default-ports (custom Security Hub CSPM rule)
+Schedule type: Change triggered
+
+Remediation:
+To modify the default port of an existing RDS DB instance, see "Modifying an Amazon RDS DB instance" in the Amazon RDS User Guide. To modify the default port of an existing RDS DB cluster, see "Modifying the DB cluster by using the console, CLI, and API" in the Amazon Aurora User Guide. For Database port, change the port value to a non-default value.
+
+Default Ports by Engine:
+- MySQL/MariaDB: 3306
+- PostgreSQL: 5432
+- Oracle: 1521
+- SQL Server: 1433
+- Aurora MySQL: 3306
+- Aurora PostgreSQL: 5432
+
+Evaluation Targets:
+1. Standalone RDS DB instances (aws_db_instance)
+2. RDS Aurora clusters (aws_rds_cluster)
+Note: This control does NOT apply to RDS instances that are members of a cluster, as the cluster-level port configuration is what matters.
+
+Conditions:
+- FAIL: If the port attribute matches the default port for the database engine
+- PASS: If the port attribute is set to a value different from the default port for the database engine
+
+Related Terraform Resources:
+
+1. Resource Type: aws_db_instance
+   Description: Provides an RDS instance resource. A DB instance is an isolated database environment in the cloud. A DB instance can contain multiple user-created databases.
+   Key Arguments:
+   - engine (Required): The database engine to use (e.g., "mysql", "postgres", "oracle-se2", "sqlserver-ex", "mariadb")
+   - port (Optional): The port on which the DB accepts connections. If not specified, defaults to the engine's default port
+   - instance_class (Required): The instance type of the RDS instance
+   - identifier (Optional): The name of the RDS instance
+   - vpc_security_group_ids (Optional): List of VPC security groups to associate
+
+2. Resource Type: aws_rds_cluster
+   Description: Manages a RDS Aurora Cluster or a RDS Multi-AZ DB Cluster. Used for Aurora database clusters which can contain multiple instances.
+   Key Arguments:
+   - engine (Required): Name of the database engine to be used (e.g., "aurora-mysql", "aurora-postgresql", "mysql", "postgres")
+   - port (Optional): Port on which the DB accepts connections. If not specified, defaults to the engine's default port
+   - cluster_identifier (Optional): The cluster identifier
+   - master_username (Required unless snapshot or replica): Username for the master DB user
+   - vpc_security_group_ids (Optional): List of VPC security groups to associate with the Cluster
+
+3. Resource Type: aws_db_subnet_group
+   Description: Provides an RDS DB subnet group resource. DB instance will be created in the VPC associated with the DB subnet group.
+   Key Arguments:
+   - name (Required): The name of the DB subnet group
+   - subnet_ids (Required): A list of VPC subnet IDs
+   - tags (Optional): A map of tags to assign to the resource
+
+4. Resource Type: aws_security_group
+   Description: Provides a security group resource to control inbound and outbound traffic to RDS instances.
+   Key Arguments:
+   - name (Required): Name of the security group
+   - vpc_id (Required): VPC ID
+   - ingress (Optional): Configuration block for ingress rules
+   - egress (Optional): Configuration block for egress rules
+   Note: When changing the port from default, security group rules must be updated to allow traffic on the new port.
+
+5. Resource Type: aws_rds_cluster_instance
+   Description: Provides an RDS Cluster Resource Instance. These instances inherit their port configuration from the parent cluster.
+   Key Arguments:
+   - cluster_identifier (Required): The identifier of the aws_rds_cluster
+   - instance_class (Required): The instance class to use
+   - engine (Required): The name of the database engine
+   Note: Port configuration is inherited from the parent cluster, so this resource is not directly evaluated by this control.
+
+Clarifications:
+1. The policy applies to both standalone RDS instances and Aurora clusters, but not to cluster member instances (as they inherit the cluster's port configuration).
+2. Default ports are engine-specific and well-known. The policy requires using non-default ports to prevent attackers from easily identifying the database type.
+3. When implementing this policy, the Terraform policy should check the 'port' attribute against the default port for the specified 'engine' value.
+4. If the 'port' attribute is not specified in Terraform configuration, it will default to the engine's default port at creation time, which would cause the policy to fail.

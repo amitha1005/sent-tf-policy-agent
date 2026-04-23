@@ -1,0 +1,119 @@
+Lambda Functions Should Use Supported Runtimes
+
+Policy Type: tfpolicy
+
+Detailed Description:
+Convert following Sentinel Policy to Terraform Policy
+
+# This control checks whether 'aws_lambda_function' runtime settings match the expected values set for the supported runtimes in each language.
+# Copyright IBM Corp. 2024, 2025
+# SPDX-License-Identifier: BUSL-1.1
+
+import "tfplan/v2" as tfplan
+import "tfresources" as tf
+import "report" as report
+import "collection" as collection
+import "collection/maps" as maps
+
+# Constants
+const = {
+	"policy_name":                  "lambda-functions-should-use-supported-runtimes",
+	"resource_aws_lambda_function": "aws_lambda_function",
+	"runtime":                      "runtime",
+	"message":                      "'aws_lambda_function' runtime settings should match the expected values set for the supported runtimes in each language. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html#lambda-2 for more details.",
+}
+
+runtime_expected_values = ["dotnet8", "java21", "java17", "java11", "java8.al2", "nodejs22.x", "nodejs20.x", "nodejs18.x", "python3.13", "python3.12", "python3.11", "python3.10", "python3.9", "ruby3.3", "ruby3.2"]
+
+# Functions
+
+get_violations = func(resources) {
+	return collection.reject(resources, func(res) {
+		runtime = maps.get(res.values, const.runtime, null)
+		return runtime in runtime_expected_values
+	})
+}
+
+# Variables
+
+aws_lambda_function = tf.plan(tfplan.planned_values.resources).type(const.resource_aws_lambda_function).resources
+violations = get_violations(aws_lambda_function)
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+# Outputs
+
+print(report.generate_policy_report(summary))
+
+# Rules
+
+main = rule {
+	violations is empty
+}
+
+Related Terraform Resources:
+
+1. Resource Type: aws_lambda_function
+   Description: Manages an AWS Lambda Function. Use this resource to create serverless functions that run code in response to events without provisioning or managing servers.
+   
+   Key Arguments:
+   - function_name (Required): Unique name for your Lambda Function
+   - role (Required): ARN of the function's execution role
+   - runtime (Optional): Identifier of the function's runtime. Required if package_type is Zip
+     Valid values for supported runtimes:
+     * Node.js: nodejs22.x, nodejs20.x, nodejs18.x
+     * Python: python3.13, python3.12, python3.11, python3.10, python3.9
+     * Java: java21, java17, java11, java8.al2
+     * .NET: dotnet8
+     * Ruby: ruby3.3, ruby3.2
+   - handler (Optional): Function entry point in your code. Required if package_type is Zip
+   - memory_size (Optional): Amount of memory in MB. Valid between 128 MB to 32,768 MB. Defaults to 128
+   - timeout (Optional): Amount of time function has to run in seconds. Valid between 1 and 900. Defaults to 3
+   - architectures (Optional): Instruction set architecture. Valid values: ["x86_64"], ["arm64"]. Default: ["x86_64"]
+   - package_type (Optional): Lambda deployment package type. Valid values: Zip, Image. Defaults to Zip
+   - filename (Optional): Path to deployment package. Conflicts with image_uri and s3_bucket
+   - image_uri (Optional): ECR image URI. Conflicts with filename and s3_bucket
+   - s3_bucket (Optional): S3 bucket location. Conflicts with filename and image_uri
+   - environment (Optional): Configuration block for environment variables
+   - vpc_config (Optional): Configuration block for VPC
+   - layers (Optional): List of Lambda Layer Version ARNs (maximum of 5)
+   - tracing_config (Optional): Configuration block for X-Ray tracing
+   - dead_letter_config (Optional): Configuration block for dead letter queue
+   - logging_config (Optional): Configuration block for advanced logging settings
+   - snap_start (Optional): Configuration block for snap start settings
+   - ephemeral_storage (Optional): Amount of ephemeral storage (/tmp) to allocate
+   - file_system_config (Optional): Configuration block for EFS file system
+   - code_signing_config_arn (Optional): ARN of code-signing configuration
+   - kms_key_arn (Optional): ARN of KMS key for environment variable encryption
+   - reserved_concurrent_executions (Optional): Amount of reserved concurrent executions
+   - publish (Optional): Whether to publish creation/change as new version. Defaults to false
+   - tags (Optional): Key-value map of tags
+
+   Attribute References:
+   - arn: ARN identifying your Lambda Function
+   - invoke_arn: ARN for invoking from API Gateway
+   - qualified_arn: ARN with version number (if publish = true)
+   - version: Latest published version
+   - last_modified: Date resource was last modified
+   - source_code_size: Size in bytes of the function .zip file
+
+Policy Evaluation Logic:
+The policy checks that the 'runtime' argument of aws_lambda_function resources matches one of the supported runtime values listed in the Sentinel policy. Functions using deprecated or unsupported runtimes will be flagged as violations.
+
+Supported Runtime Values (as per the Sentinel policy):
+- dotnet8
+- java21, java17, java11, java8.al2
+- nodejs22.x, nodejs20.x, nodejs18.x
+- python3.13, python3.12, python3.11, python3.10, python3.9
+- ruby3.3, ruby3.2
+
+Reference: https://docs.aws.amazon.com/securityhub/latest/userguide/lambda-controls.html#lambda-2

@@ -1,0 +1,102 @@
+KMS.2 - IAM principals should not have IAM inline policies that allow decryption actions on all KMS keys
+
+Policy Type: tfpolicy
+
+Detailed Description:
+
+Control ID: KMS.2
+Title: [KMS.2] IAM principals should not have IAM inline policies that allow decryption actions on all KMS keys
+Source: AWS Security Hub - NIST 800 53 REV5
+Resource Type: AWS::IAM::Group, AWS::IAM::Role, AWS::IAM::User
+Category: Protect > Secure access management
+Severity: Medium
+
+Related requirements: NIST.800-53.r5 AC-2, NIST.800-53.r5 AC-2(1), NIST.800-53.r5 AC-3, NIST.800-53.r5 AC-3(15), NIST.800-53.r5 AC-3(7), NIST.800-53.r5 AC-5, NIST.800-53.r5 AC-6, NIST.800-53.r5 AC-6(3)
+
+AWS Config rule: iam-inline-policy-blocked-kms-actions
+Schedule type: Change triggered
+Parameters: blockedActionsPatterns: kms:ReEncryptFrom, kms:Decrypt (not customizable)
+
+Policy Specification:
+
+This control checks whether the inline policies that are embedded in your IAM identities (role, user, or group) allow the AWS KMS decryption and re-encryption actions on all KMS keys. The control fails if the policy is open enough to allow kms:Decrypt or kms:ReEncryptFrom actions on all KMS keys.
+
+The control only checks KMS keys in the Resource element and doesn't take into account any conditionals in the Condition element of a policy.
+
+With AWS KMS, you control who can use your KMS keys and gain access to your encrypted data. IAM policies define which actions an identity (user, group, or role) can perform on which resources. Following security best practices, AWS recommends that you allow least privilege. In other words, you should grant to identities only the permissions they need and only for keys that are required to perform a task. Otherwise, the user might use keys that are not appropriate for your data.
+
+Instead of granting permission for all keys, determine the minimum set of keys that users need to access encrypted data. Then design policies that allow the users to use only those keys. For example, do not allow kms:Decrypt permission on all KMS keys. Instead, allow the permission only on specific keys in a specific Region for your account. By adopting the principle of least privilege, you can reduce the risk of unintended disclosure of your data.
+
+Remediation:
+
+To modify an IAM inline policy, see Editing inline policies in the IAM User Guide. When editing your policy, for the Resource field, provide the Amazon Resource Name (ARN) of the specific key or keys that you want to allow decryption actions on.
+
+Related Terraform Resources:
+
+1. aws_iam_user_policy
+   Description: Provides an IAM policy attached to a user (inline policy).
+   Key Arguments:
+   - name (Optional): The name of the policy. If omitted, Terraform will assign a random, unique name.
+   - name_prefix (Optional): Creates a unique name beginning with the specified prefix. Conflicts with name.
+   - user (Required): IAM user to which to attach this policy.
+   - policy (Required): The policy document. This is a JSON formatted string.
+   
+   The policy argument contains the inline policy document in JSON format. This is where kms:Decrypt and kms:ReEncryptFrom actions with Resource: "*" should be checked.
+
+2. aws_iam_role_policy
+   Description: Provides an IAM role inline policy.
+   Key Arguments:
+   - name (Optional): The name of the role policy. If omitted, Terraform will assign a random, unique name.
+   - name_prefix (Optional): Creates a unique name beginning with the specified prefix. Conflicts with name.
+   - role (Required): The name of the IAM role to attach to the policy.
+   - policy (Required): The inline policy document. This is a JSON formatted string.
+   
+   The policy argument contains the inline policy document in JSON format. This is where kms:Decrypt and kms:ReEncryptFrom actions with Resource: "*" should be checked.
+
+3. aws_iam_group_policy
+   Description: Provides an IAM policy attached to a group (inline policy).
+   Key Arguments:
+   - name (Optional): The name of the policy. If omitted, Terraform will assign a random, unique name.
+   - name_prefix (Optional): Creates a unique name beginning with the specified prefix. Conflicts with name.
+   - group (Required): The IAM group to attach to the policy.
+   - policy (Required): The policy document. This is a JSON formatted string.
+   
+   The policy argument contains the inline policy document in JSON format. This is where kms:Decrypt and kms:ReEncryptFrom actions with Resource: "*" should be checked.
+
+4. aws_iam_policy_document (data source)
+   Description: Generates an IAM policy document in JSON format for use with resources that expect policy documents.
+   Key Arguments:
+   - statement (Optional): Configuration block for a policy statement with:
+     - actions (Optional): List of actions that this statement either allows or denies
+     - resources (Optional): List of resource ARNs that this statement applies to
+     - effect (Optional): Whether this statement allows or denies the given actions (Allow/Deny)
+     - condition (Optional): Configuration block for conditions
+   
+   This data source is useful for parsing and analyzing the policy document content to check for overly permissive KMS actions.
+
+5. aws_kms_key
+   Description: Manages a single-Region or multi-Region primary KMS key.
+   Key Arguments:
+   - description (Optional): The description of the key as viewed in AWS console.
+   - key_usage (Optional): Specifies the intended use of the key. Valid values: ENCRYPT_DECRYPT, SIGN_VERIFY, or GENERATE_VERIFY_MAC.
+   - policy (Optional): A valid policy JSON document. This is a key policy, not an IAM policy.
+   - enable_key_rotation (Optional): Specifies whether key rotation is enabled.
+   - multi_region (Optional): Indicates whether the KMS key is a multi-Region (true) or regional (false) key.
+   
+   This resource represents the KMS keys that should be protected. The policy needs to ensure IAM inline policies don't grant decrypt permissions on all keys (Resource: "*").
+
+Clarifications:
+
+1. Scope of Evaluation: The policy must specifically check inline policies (aws_iam_user_policy, aws_iam_role_policy, aws_iam_group_policy) and not managed policies or permission boundaries.
+
+2. Resource Wildcard Detection: The policy should fail when it detects:
+   - Resource element set to "*" (all resources)
+   - Resource element with wildcards that effectively grant access to all KMS keys
+   - Actions that include kms:Decrypt, kms:ReEncryptFrom, or wildcards like kms:* or kms:Re*
+
+3. Condition Element Handling: As specified in the control documentation, the policy should only evaluate the Resource element and not take into account any conditionals in the Condition element. This means even if a Condition restricts access, if the Resource is "*", the policy should still fail.
+
+4. Action Pattern Matching: The policy must detect:
+   - Exact action matches: "kms:Decrypt", "kms:ReEncryptFrom"
+   - Wildcard action patterns: "kms:*", "kms:Re*", "*"
+   - Case sensitivity should be handled according to AWS IAM policy standards (actions are case-sensitive)

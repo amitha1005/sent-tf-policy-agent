@@ -1,0 +1,300 @@
+S3 Bucket Block Public Read Access Policy
+
+Policy Type: tfpolicy
+
+Detailed Description:
+Convert the following Sentinel Policy to Terraform Policy:
+
+# S3 general purpose buckets should block public read access
+
+# Copyright IBM Corp. 2024, 2025
+# SPDX-License-Identifier: BUSL-1.1
+
+# Imports
+
+import "tfconfig/v2" as tfconfig
+import "tfstate/v2" as tfstate
+import "tfresources" as tf
+import "report" as report
+import "collection" as collection
+import "collection/maps" as maps
+import "strings"
+import "types"
+
+# Constants
+
+const = {
+	"policy_name":                         "s3-bucket-block-public-read-access",
+	"message":                             "S3 general purpose buckets should block public read access. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-2 for more details.",
+	"resource_aws_s3_bucket":              "aws_s3_bucket",
+	"resource_aws_s3_bucket_policy":       "aws_s3_bucket_policy",
+	"resource_aws_iam_policy_document":    "aws_iam_policy_document",
+	"resource_aws_s3_public_access_block": "aws_s3_bucket_public_access_block",
+	"resource_aws_s3_bucket_acl":          "aws_s3_bucket_acl",
+	"Allow":                                  "Allow",
+	"address":                                "address",
+	"module_address":                         "module_address",
+	"module_prefix":                          "module.",
+	"values":                                 "values",
+	"variable":                               "variable",
+	"references":                             "references",
+	"acl_not_valid_values":                   ["public-read", "public-read-write", "authenticated-read", "aws-exec-read"],
+	"access_control_policy_not_valid_values": ["FULL_CONTROL", "READ", "READ_ACP"],
+}
+
+# Functions
+
+# Removes module address prefix from a resource
+# and returns back the localized address for a module.
+resource_address_without_module_address = func(res) {
+	resource_addr = res[const.address]
+
+	# Check for root module
+	if not strings.has_prefix(resource_addr, const.module_prefix) {
+		return resource_addr
+	}
+
+	module_addr_prefix = res[const.module_address] + "."
+	return strings.trim_prefix(resource_addr, module_addr_prefix)
+}
+
+# Function to check if policy document has public read violations
+has_public_read_policy_violation = func(res) {
+	policy = res.config.policy
+	if policy[const.references] is not defined or policy[const.references][1] not matches "^data.aws_iam_policy_document.(.*)$" {
+		return false
+	}
+	reference = policy[const.references][1]
+
+	address = strings.trim_prefix(reference, "data.")
+	// Append the module address to the data source's local address
+	// in case of nested modules
+	if strings.has_prefix(res.module_address, const.module_prefix) {
+		address = res.module_address + "." + address
+	}
+	datasource = tf.state(tfstate.resources).mode("data").address(address).resources
+	if datasource is null or datasource is not defined or datasource is empty {
+		address = "data." + address
+		datasource = tf.config(tfconfig.resources).mode("data").address(address).resources
+		if datasource is null or datasource is not defined {
+			return false
+		}
+		statements = datasource[0].config.statement
+		if statements is not defined {
+			return false
+		}
+		for statements as _, statement {
+			actions = maps.get(statement, "actions", {})
+			effect = maps.get(statement, "effect", {})
+			if (types.type_of(effect) is not "string" and effect.constant_value is const.Allow) or
+				(types.type_of(effect) is "string" and effect is const.Allow) {
+				if types.type_of(actions) is not "string" {
+					action_values = actions.constant_value
+				} else {
+					action_values = [actions]
+				}
+				if action_values is not defined {
+					continue
+				}
+				for action_values as _, action {
+					if action contains ":*" or action contains "s3:GetObject" or action contains "s3:GetBucket" {
+						return true
+					}
+				}
+			}
+		}
+		return false
+	}
+
+	statements = datasource[0].values.statement
+	if statements is undefined {
+		return false
+	}
+	for statements as _, statement {
+		actions = maps.get(statement, "actions", [])
+		effect = maps.get(statement, "effect", "")
+		if effect is const.Allow {
+			for actions as _, action {
+				if action contains ":*" or action contains "s3:GetObject" or action contains "s3:GetBucket" {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+# Function to check if public access block has violations
+has_public_access_block_violation = func(config) {
+	block_public_acls = maps.get(maps.get(config, "block_public_acls", {}), "constant_value", false)
+	ignore_public_acls = maps.get(maps.get(config, "ignore_public_acls", {}), "constant_value", false)
+	block_public_policy = maps.get(maps.get(config, "block_public_policy", {}), "constant_value", false)
+	restrict_public_buckets = maps.get(maps.get(config, "restrict_public_buckets", {}), "constant_value", false)
+	return not (block_public_acls and ignore_public_acls and block_public_policy and restrict_public_buckets)
+}
+
+# Function to check if bucket ACL has violations
+has_bucket_acl_violation = func(config) {
+	acl = maps.get(maps.get(config, "acl", {}), "constant_value", null)
+	if acl is not null and acl in const.acl_not_valid_values {
+		return true
+	}
+	access_control_policy = maps.get(maps.get(config, "access_control_policy", {}), "constant_value", [])
+	if access_control_policy is not empty {
+		grant = maps.get(access_control_policy[0], "grant", [])
+		if grant is not empty {
+			permission = maps.get(grant[0], "permission", "")
+			if permission is not "" and permission in const.access_control_policy_not_valid_values {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+# Prefixes the referenced s3 bucket's address with
+# the module address. This is done because resource
+# addresses comprise of module addresses
+sanitize_referenced_s3_bucket_address = func(res) {
+	module_addr = res[const.module_address]
+	if res.config.bucket.constant_value is defined {
+		return ""
+	}
+
+	bucket_reference = res.config.bucket.references[1]
+	# Check for root module
+	if not strings.has_prefix(res[const.address], const.module_prefix) {
+		return bucket_reference
+	}
+
+	return module_addr + "." + bucket_reference
+}
+
+build_violation_object = func(resource_addr, module_addr, message) {
+	return {
+		"address":        resource_addr,
+		"module_address": module_addr,
+		"message":        message,
+	}
+}
+
+# Variables
+
+config_resources = tf.config(tfconfig.resources)
+s3_bucket_resources = config_resources.type(const.resource_aws_s3_bucket).resources
+
+# Get bucket policy resources that have violations
+bucket_policy_violations = filter config_resources.type(const.resource_aws_s3_bucket_policy).resources as _, res {
+	has_public_read_policy_violation(res)
+}
+
+# Get public access block resources that have violations
+public_access_block_violations = filter config_resources.type(const.resource_aws_s3_public_access_block).resources as _, res {
+	has_public_access_block_violation(res.config)
+}
+
+# Get bucket ACL resources that have violations
+bucket_acl_violations = filter config_resources.type(const.resource_aws_s3_bucket_acl).resources as _, res {
+	has_bucket_acl_violation(res.config)
+}
+
+# Get bucket addresses that have policy violations
+bucket_addresses_with_policy_violations = map bucket_policy_violations as _, res {
+	sanitize_referenced_s3_bucket_address(res)
+}
+
+# Get bucket addresses that have public access block violations
+bucket_addresses_with_access_block_violations = map public_access_block_violations as _, res {
+	sanitize_referenced_s3_bucket_address(res)
+}
+
+# Get bucket addresses that have ACL violations
+bucket_addresses_with_acl_violations = map bucket_acl_violations as _, res {
+	sanitize_referenced_s3_bucket_address(res)
+}
+
+# Find violations: buckets that have policy violations OR have access block violations OR have ACL violations
+violations = filter s3_bucket_resources as _, res {
+	res.address in bucket_addresses_with_policy_violations or
+		res.address in bucket_addresses_with_access_block_violations or
+		res.address in bucket_addresses_with_acl_violations
+}
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		build_violation_object(v.address, v.module_address, const.message)
+	},
+}
+
+print(report.generate_policy_report(summary))
+main = rule {
+	violations is empty
+}
+
+Related Terraform Resources:
+
+1. Resource Type: aws_s3_bucket
+   Description: Provides a S3 bucket resource for general purpose buckets
+   Key Arguments:
+   - bucket: (Optional, Forces new resource) Name of the bucket
+   - bucket_prefix: (Optional, Forces new resource) Creates a unique bucket name beginning with the specified prefix
+   - force_destroy: (Optional, Default: false) Boolean that indicates all objects should be deleted from the bucket when the bucket is destroyed
+   - object_lock_enabled: (Optional, Forces new resource) Indicates whether this bucket has an Object Lock configuration enabled
+   - tags: (Optional) Map of tags to assign to the bucket
+   Attributes:
+   - id: Name of the bucket
+   - arn: ARN of the bucket (format: arn:aws:s3:::bucketname)
+   - bucket_domain_name: Bucket domain name
+
+2. Resource Type: aws_s3_bucket_public_access_block
+   Description: Manages S3 bucket-level Public Access Block configuration
+   Key Arguments:
+   - bucket: (Required) S3 Bucket to which this Public Access Block configuration should be applied
+   - block_public_acls: (Optional) Whether Amazon S3 should block public ACLs for this bucket (defaults to false)
+   - block_public_policy: (Optional) Whether Amazon S3 should block public bucket policies for this bucket (defaults to false)
+   - ignore_public_acls: (Optional) Whether Amazon S3 should ignore public ACLs for this bucket (defaults to false)
+   - restrict_public_buckets: (Optional) Whether Amazon S3 should restrict public bucket policies for this bucket (defaults to false)
+   - skip_destroy: (Optional) Whether to retain the public access block upon destruction
+   Attributes:
+   - id: Name of the S3 bucket the configuration is attached to
+
+3. Resource Type: aws_s3_bucket_policy
+   Description: Attaches a policy to an S3 bucket resource
+   Key Arguments:
+   - bucket: (Required) Name of the bucket to which to apply the policy
+   - policy: (Required) Text of the policy (limited to 20 KB in size)
+   Note: Only one aws_s3_bucket_policy resource should be defined per S3 bucket
+
+4. Resource Type: aws_s3_bucket_acl
+   Description: Provides an S3 bucket ACL resource
+   Key Arguments:
+   - bucket: (Required, Forces new resource) Bucket to which to apply the ACL
+   - acl: (Optional) Canned ACL to apply (valid values: private, public-read, public-read-write, aws-exec-read, authenticated-read, bucket-owner-read, bucket-owner-full-control, log-delivery-write)
+   - access_control_policy: (Optional) Configuration block that sets the ACL permissions for an object per grantee
+     - grant: Set of grant configuration blocks
+       - grantee: Configuration block for the person being granted permissions
+       - permission: Logging permissions (FULL_CONTROL, WRITE, WRITE_ACP, READ, READ_ACP)
+     - owner: Configuration block for the bucket owner's display name and ID
+   Attributes:
+   - id: The bucket, expected_bucket_owner, and acl separated by commas
+   Note: terraform destroy does not delete the S3 Bucket ACL but does remove the resource from Terraform state
+
+5. Data Source Type: aws_iam_policy_document
+   Description: Generates an IAM policy document in JSON format for use with bucket policies
+   Key Arguments:
+   - statement: (Optional) Configuration block for a policy statement
+     - sid: (Optional) Statement ID
+     - effect: (Optional) Whether this statement allows or denies (Allow or Deny, defaults to Allow)
+     - actions: (Optional) List of actions that this statement either allows or denies
+     - resources: (Optional) List of resource ARNs that this statement applies to
+     - principals: (Optional) Configuration block for principals
+       - type: (Required) Type of principal (AWS, Service, Federated, CanonicalUser, or *)
+       - identifiers: (Required) List of identifiers for principals
+     - condition: (Optional) Configuration block for a condition
+       - test: (Required) Name of the IAM condition operator to evaluate
+       - variable: (Required) Name of a Context Variable to apply the condition to
+       - values: (Required) Values to evaluate the condition against
+   Attributes:
+   - json: Standard JSON policy document rendered based on the arguments
+   - minified_json: Minified JSON policy document

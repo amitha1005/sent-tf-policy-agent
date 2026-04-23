@@ -1,0 +1,24 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An aws_cloudtrail resource with cloud_watch_logs_group_arn attribute set to a valid ARN",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass"
+    },
+    {
+      "given": "An aws_cloudtrail resource with cloud_watch_logs_group_arn attribute set to an empty string",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    },
+    {
+      "given": "An aws_cloudtrail resource without cloud_watch_logs_group_arn attribute",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    },
+    {
+      "given": "An aws_cloudtrail resource with cloud_watch_logs_group_arn attribute set to null",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    }
+  ]
+}

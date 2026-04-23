@@ -1,0 +1,49 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An HTTP listener on port 80 with redirect to HTTPS on port 443 using HTTP_301",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should pass because the redirect is properly configured"
+    },
+    {
+      "given": "An HTTP listener on port 80 with redirect to HTTPS on port 443 using HTTP_302",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should pass because HTTP_302 is also acceptable"
+    },
+    {
+      "given": "An HTTP listener on port 80 with redirect using #{protocol} and #{port} interpolation",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should pass because interpolated values are acceptable"
+    },
+    {
+      "given": "An HTTP listener on port 80 with forward action to target group (no redirect)",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should fail because HTTP traffic is not redirected to HTTPS"
+    },
+    {
+      "given": "An HTTP listener on port 80 with redirect to HTTP on port 80 (same protocol)",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should fail because the redirect is not to HTTPS"
+    },
+    {
+      "given": "An HTTP listener on port 80 with redirect to HTTPS on port 8443 (wrong port)",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should fail because the redirect is not to port 443"
+    },
+    {
+      "given": "An HTTP listener on port 80 with fixed-response action",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should fail because there is no redirect action"
+    },
+    {
+      "given": "An HTTPS listener on port 443",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should not evaluate (filtered out by protocol and port)"
+    },
+    {
+      "given": "An HTTP listener on port 8080 (not port 80)",
+      "when": "The policy evaluates the listener",
+      "then": "The policy should not evaluate (filtered out by port)"
+    }
+  ]
+}

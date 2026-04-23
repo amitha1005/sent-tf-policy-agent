@@ -1,0 +1,64 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An aws_iam_policy with a policy document containing a statement with Effect: Allow, Action: s3:GetObject, Resource: arn:aws:s3:::my-bucket/*",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Action is not * (it's specific to s3:GetObject)"
+    },
+    {
+      "given": "An aws_iam_policy with a policy document containing a statement with Effect: Allow, Action: *, Resource: arn:aws:s3:::my-bucket/*",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Resource is not * (it's specific to a bucket)"
+    },
+    {
+      "given": "An aws_iam_policy with a policy document containing a statement with Effect: Allow, Action: *, Resource: *",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because it grants full administrative privileges (all three conditions met)"
+    },
+    {
+      "given": "An aws_iam_policy with a policy document containing a statement with Effect: Allow, Action: ['*'], Resource: ['*']",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because Action and Resource are arrays containing * (grants full admin)"
+    },
+    {
+      "given": "An aws_iam_role_policy with a policy document containing a statement with Effect: Allow, Action: ec2:*, Resource: *",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Action is not * (it's ec2:*)"
+    },
+    {
+      "given": "An aws_iam_role_policy with a policy document containing a statement with Effect: Allow, Action: *, Resource: *",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because it grants full administrative privileges"
+    },
+    {
+      "given": "An aws_iam_user_policy with a policy document containing a statement with Effect: Deny, Action: *, Resource: *",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Effect is Deny (not Allow)"
+    },
+    {
+      "given": "An aws_iam_user_policy with a policy document containing a statement with Effect: Allow, Action: *, Resource: *",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because it grants full administrative privileges"
+    },
+    {
+      "given": "An aws_iam_group_policy with a policy document containing a statement with Effect: Allow, Action: ['s3:*', 'ec2:*'], Resource: *",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because Action is not * (it's a list of specific service wildcards)"
+    },
+    {
+      "given": "An aws_iam_group_policy with a policy document containing a statement with Effect: Allow, Action: *, Resource: *",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because it grants full administrative privileges"
+    },
+    {
+      "given": "An aws_iam_policy with multiple statements where one has Effect: Allow, Action: s3:*, Resource: * and another has Effect: Allow, Action: *, Resource: *",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail because at least one statement grants full administrative privileges"
+    },
+    {
+      "given": "An aws_iam_policy with a policy document containing only statements that do not grant full admin access",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass because no statement has the combination of Effect: Allow, Action: *, Resource: *"
+    }
+  ]
+}

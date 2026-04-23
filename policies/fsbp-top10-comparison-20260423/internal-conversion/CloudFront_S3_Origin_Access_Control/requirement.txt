@@ -1,0 +1,134 @@
+CloudFront S3 Origin Access Control Enabled
+
+Policy Type: tfpolicy
+
+Detailed Description:
+Convert following Sentinel Policy to Terraform Policy
+
+// This policy checks whether an 'aws_cloudfront_distribution' with an Amazon S3 origin has 'aws_cloudfront_origin_access_control' configured.
+
+# Copyright IBM Corp. 2024, 2025
+# SPDX-License-Identifier: BUSL-1.1
+
+// Imports
+
+import "tfconfig/v2" as tfconfig
+import "tfresources" as tf
+import "report" as report
+import "collection" as collection
+import "collection/maps" as maps
+import "strings"
+
+// Constants
+
+const = {
+	"policy_name": "cloudfront-s3-origin-access-control-enabled",
+	"message":     "'aws_cloudfront_distribution' with an Amazon S3 origin has 'aws_cloudfront_origin_access_control' should have configured. Refer to https://docs.aws.amazon.com/securityhub/latest/userguide/cloudfront-controls.html#cloudfront-13 for more details.",
+	"resource_aws_cloudfront_distribution": "aws_cloudfront_distribution",
+}
+
+// Functions
+
+get_origin_access_violations = func(res) {
+	origin_access_control_origin_type = maps.get(res[0].config, "origin_access_control_origin_type", {})
+	if origin_access_control_origin_type is empty {
+		return false
+	}
+	value = maps.get(origin_access_control_origin_type, "constant_value", "")
+	return value == "s3"
+}
+
+get_violations = func(resources) {
+	return collection.reject(resources, func(res) {
+		origin = maps.get(res.config, "origin", [])
+		if origin is empty {
+			return false
+		}
+		origin_access_control_id = maps.get(origin[0], "origin_access_control_id", [])
+		if origin_access_control_id is empty {
+			return false
+		}
+		references = maps.get(origin_access_control_id, "references", [])
+		if references is empty {
+			return false
+		}
+		for references as ref {
+			ref_split = strings.split(ref, ".")
+			if ref_split is empty or length(ref_split) < 2 {
+				return false
+			}
+			origin_access_control = ref_split[0] + "." + ref_split[1]
+			origin_access_control_resource = tf.config(tfconfig.resources).address(origin_access_control).resources
+			if origin_access_control_resource is empty {
+				return false
+			}
+			violation = get_origin_access_violations(origin_access_control_resource)
+			if !violation {
+				return false
+			}
+		}
+		return true
+	})
+}
+
+// Variables
+
+config_resources = tf.config(tfconfig.resources)
+cloudfront_distribution_resource = config_resources.type(const.resource_aws_cloudfront_distribution).resources
+
+violations = get_violations(cloudfront_distribution_resource)
+
+summary = {
+	"policy_name": const.policy_name,
+	"violations": map violations as _, v {
+		{
+			"address":        v.address,
+			"module_address": v.module_address,
+			"message":        const.message,
+		}
+	},
+}
+
+// Outputs
+
+print(report.generate_policy_report(summary))
+
+// Rules
+
+main = rule {
+	violations is empty
+}
+
+Related Terraform Resources:
+
+1. Resource Type: aws_cloudfront_distribution
+   Description: Provides a CloudFront web distribution resource. This resource creates an Amazon CloudFront distribution for content delivery.
+   
+   Key Arguments:
+   - enabled (Required): Whether the distribution is enabled to accept end user requests for content
+   - origin (Required): One or more origins for this distribution. Each origin block supports:
+     * domain_name (Required): DNS domain name of either the S3 bucket or custom origin
+     * origin_id (Required): Unique identifier for the origin
+     * origin_access_control_id (Optional): Unique identifier of a CloudFront origin access control for this origin
+     * s3_origin_config (Optional): CloudFront S3 origin configuration information
+     * custom_origin_config: CloudFront custom origin configuration information
+   - default_cache_behavior (Required): Default cache behavior for this distribution
+   - restrictions (Required): Restriction configuration for this distribution
+   - viewer_certificate (Required): SSL configuration for this distribution
+   - comment (Optional): Any comments about the distribution
+   - default_root_object (Optional): Object that CloudFront returns when end user requests the root URL
+
+2. Resource Type: aws_cloudfront_origin_access_control
+   Description: Manages an AWS CloudFront Origin Access Control, which is used by CloudFront Distributions with an Amazon S3 bucket as the origin to restrict access.
+   
+   Key Arguments:
+   - name (Required): A name that identifies the Origin Access Control
+   - origin_access_control_origin_type (Required): The type of origin that this Origin Access Control is for. Valid values are 'lambda', 'mediapackagev2', 'mediastore', and 's3'
+   - signing_behavior (Required): Specifies which requests CloudFront signs. Valid values: 'always', 'never', and 'no-override'
+   - signing_protocol (Required): Determines how CloudFront signs (authenticates) requests. The only valid value is 'sigv4'
+   - description (Optional): The description of the Origin Access Control
+   
+   Attributes:
+   - id: The unique identifier of this Origin Access Control
+   - arn: The Origin Access Control ARN
+   - etag: The current version of this Origin Access Control

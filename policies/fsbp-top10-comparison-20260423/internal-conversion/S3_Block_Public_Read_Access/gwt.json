@@ -1,0 +1,84 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An S3 bucket with public access block having all four settings enabled (block_public_acls, ignore_public_acls, block_public_policy, restrict_public_buckets all true)",
+      "when": "The policy evaluates the public access block configuration",
+      "then": "The policy should pass because all public access protections are enabled"
+    },
+    {
+      "given": "An S3 bucket with public access block missing block_public_acls setting (false)",
+      "when": "The policy evaluates the public access block configuration",
+      "then": "The policy should fail because not all four settings are enabled"
+    },
+    {
+      "given": "An S3 bucket with public access block missing ignore_public_acls setting (false)",
+      "when": "The policy evaluates the public access block configuration",
+      "then": "The policy should fail because not all four settings are enabled"
+    },
+    {
+      "given": "An S3 bucket with public access block missing block_public_policy setting (false)",
+      "when": "The policy evaluates the public access block configuration",
+      "then": "The policy should fail because not all four settings are enabled"
+    },
+    {
+      "given": "An S3 bucket with public access block missing restrict_public_buckets setting (false)",
+      "when": "The policy evaluates the public access block configuration",
+      "then": "The policy should fail because not all four settings are enabled"
+    },
+    {
+      "given": "An S3 bucket ACL with private canned ACL",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should pass because private ACL does not allow public access"
+    },
+    {
+      "given": "An S3 bucket ACL with public-read canned ACL",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should fail because public-read allows public access"
+    },
+    {
+      "given": "An S3 bucket ACL with public-read-write canned ACL",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should fail because public-read-write allows public access"
+    },
+    {
+      "given": "An S3 bucket ACL with authenticated-read canned ACL",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should fail because authenticated-read allows public access"
+    },
+    {
+      "given": "An S3 bucket ACL with aws-exec-read canned ACL",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should fail because aws-exec-read allows public access"
+    },
+    {
+      "given": "An S3 bucket ACL with access control policy grant having WRITE permission",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should pass because WRITE permission is not in the prohibited list"
+    },
+    {
+      "given": "An S3 bucket ACL with access control policy grant having READ permission",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should fail because READ permission allows public read access"
+    },
+    {
+      "given": "An S3 bucket ACL with access control policy grant having FULL_CONTROL permission",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should fail because FULL_CONTROL includes read access"
+    },
+    {
+      "given": "An S3 bucket ACL with access control policy grant having READ_ACP permission",
+      "when": "The policy evaluates the bucket ACL configuration",
+      "then": "The policy should fail because READ_ACP allows reading access control policies"
+    },
+    {
+      "given": "An S3 bucket with proper public access block and a bucket policy with no public read actions",
+      "when": "The policy evaluates the bucket configuration",
+      "then": "The policy should pass because no public read access is configured"
+    },
+    {
+      "given": "An S3 bucket with a bucket policy referencing an IAM policy document that allows s3:GetObject action",
+      "when": "The policy evaluates the bucket policy and related policy document",
+      "then": "The policy should fail because the policy allows public read access via s3:GetObject"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "test_scenarios": [
+    {
+      "given": "An application load balancer with an HTTP listener (port 80) that has inline redirect to HTTPS (port 443)",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass"
+    },
+    {
+      "given": "An application load balancer with an HTTP listener (port 80) without redirect configuration",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    },
+    {
+      "given": "An application load balancer with an HTTP listener (port 80) that has an associated listener rule with redirect to HTTPS (port 443)",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass"
+    },
+    {
+      "given": "A network load balancer (not application type)",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass (filtered out by load_balancer_type)"
+    },
+    {
+      "given": "An application load balancer with only HTTPS listeners (no HTTP on port 80)",
+      "when": "The policy is evaluated",
+      "then": "The policy should pass (no HTTP listeners to redirect)"
+    },
+    {
+      "given": "An application load balancer with an HTTP listener that redirects to wrong port (not 443)",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    },
+    {
+      "given": "An application load balancer with an HTTP listener that redirects to wrong protocol (not HTTPS)",
+      "when": "The policy is evaluated",
+      "then": "The policy should fail"
+    }
+  ]
+}
